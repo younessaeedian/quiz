@@ -8,7 +8,7 @@ import { goodScoreAnimationData } from './data/goodScoreAnimation';
 
 const INCORRECT_QUESTION_IDS_KEY = 'interactiveQuizIncorrectQuestionIds';
 
-// Fisher-Yates shuffle algorithm
+// الگوریتم Fisher-Yates برای درهم‌ریزی آرایه
 const shuffleArray = <T,>(array: T[]): T[] => {
   const newArray = [...array];
   for (let i = newArray.length - 1; i > 0; i--) {
@@ -18,12 +18,13 @@ const shuffleArray = <T,>(array: T[]): T[] => {
   return newArray;
 };
 
-// Utility function to convert numbers to Persian digits
+// تابع کمکی برای تبدیل اعداد به فارسی
 const toPersianDigits = (num: string | number): string => {
   const persianDigits = ['۰', '۱', '۲', '۳', '۴', '۵', '۶', '۷', '۸', '۹'];
   return String(num).replace(/[0-9]/g, (digit) => persianDigits[parseInt(digit)]);
 };
 
+// کامپوننت آیکون بستن
 const CloseIcon: React.FC<{ className?: string }> = ({ className = "h-5 w-5" }) => (
   <svg xmlns="http://www.w3.org/2000/svg" className={className} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
     <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
@@ -44,8 +45,7 @@ const App: React.FC = () => {
   const [currentSessionIncorrectIds, setCurrentSessionIncorrectIds] = useState<Set<string>>(new Set());
   const [isReviewMode, setIsReviewMode] = useState<boolean>(false);
 
-  // ================== بخش افکت‌های صوتی (با مسیر اصلاح شده) ==================
-  // مسیرها به‌روز شد تا از پوشه /sound/ خوانده شوند
+  // بخش افکت‌های صوتی با مسیر صحیح
   const correctSound = useMemo(() => new Audio('/sound/gp_correct_sound.mp3'), []);
   const incorrectSound = useMemo(() => new Audio('/sound/gp_incorrect_sound.mp3'), []);
 
@@ -53,7 +53,6 @@ const App: React.FC = () => {
     audio.currentTime = 0;
     audio.play().catch(error => console.error("Error playing sound:", error));
   };
-  // ===============================================================
 
   useEffect(() => {
     const storedIdsRaw = localStorage.getItem(INCORRECT_QUESTION_IDS_KEY);
@@ -86,6 +85,7 @@ const App: React.FC = () => {
     setScore(0);
     setSelectedAnswer(null);
     setShowFeedback(false);
+    // گزینه‌ها مستقیماً از سوال اول در ساختار داده جدید خوانده می‌شوند
     setCurrentOptions(shuffleArray(shuffledQuestions[0].options));
     setIsReviewMode(reviewMode);
     setCurrentSessionIncorrectIds(new Set());
@@ -113,7 +113,7 @@ const App: React.FC = () => {
     const currentQ = questions[currentQuestionIndex];
 
     if (answer === currentQ.answer) {
-      playSound(correctSound);
+      playSound(correctSound); // پخش صدای صحیح
       setScore(prevScore => prevScore + 1);
       if (isReviewMode) {
         setCurrentSessionIncorrectIds(prev => {
@@ -129,7 +129,7 @@ const App: React.FC = () => {
         });
       }
     } else {
-      playSound(incorrectSound);
+      playSound(incorrectSound); // پخش صدای غلط
       setCurrentSessionIncorrectIds(prev => new Set(prev).add(currentQ.id));
     }
   }, [showFeedback, questions, currentQuestionIndex, isReviewMode, correctSound, incorrectSound]);
@@ -141,6 +141,7 @@ const App: React.FC = () => {
     if (currentQuestionIndex < questions.length - 1) {
       const nextIndex = currentQuestionIndex + 1;
       setCurrentQuestionIndex(nextIndex);
+      // گزینه‌های سوال بعدی مستقیماً خوانده می‌شوند
       setCurrentOptions(shuffleArray(questions[nextIndex].options));
     } else {
       if (!isReviewMode) {
@@ -239,7 +240,8 @@ const App: React.FC = () => {
         </div>
       )}
       
-      <main className="w-full max-w-xl mx-auto space-y-6 pt-20 sm:pt-24 pb-28 px-4 flex-grow flex flex-col">
+      {/* افزودن padding-bottom زیاد برای جلوگیری از پنهان شدن محتوا زیر دکمه‌های ثابت */}
+      <main className="w-full max-w-xl mx-auto space-y-6 pt-20 sm:pt-24 px-4 flex-grow flex flex-col pb-40">
         <div className="p-5 sm:p-6 rounded-2xl flex-grow flex flex-col">
           {renderContent()}
         </div>
