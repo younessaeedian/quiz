@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>آزمون چهار گزینه ای</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@100..900&display=swap" rel="stylesheet">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/lottie-web/5.12.2/lottie.min.js"></script>
+  <style>
+    body {
+      font-family: 'Vazirmatn', Tahoma, 'Helvetica Neue', Arial, sans-serif;
+      font-weight: 300; /* Set a lighter default font weight */
+      -webkit-font-smoothing: antialiased; /* Smoother fonts on WebKit */
+      -moz-osx-font-smoothing: grayscale; /* Smoother fonts on Firefox */
+    }
+    .fade-in { /* This class is used on components for initial load animation */
+      animation: fadeInAnimation 0.2s ease-out forwards;
+    }
+    @keyframes fadeInAnimation {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    
+    @keyframes slideInFromLeftContentAnimation {
+      from { opacity: 0; transform: translateX(-30px); } /* For RTL, -ve X is from the left */
+      to { opacity: 1; transform: translateX(0); }
+    }
+    .animate-slide-in-left-content {
+      animation: slideInFromLeftContentAnimation 0.3s ease-out forwards;
+    }
+
+    @keyframes shakeAnimation {
+      0%, 100% { transform: translateX(0); }
+      25% { transform: translateX(-4px); }
+      50% { transform: translateX(4px); }
+      75% { transform: translateX(-4px); }
+    }
+    .animate-shake {
+      animation: shakeAnimation 0.3s ease-in-out;
+    }
+
+    @keyframes correctPulseAnimation {
+      0%, 100% { transform: scale(1); }
+      50% { transform: scale(1.03); }
+    }
+    .animate-correct-pulse {
+      animation: correctPulseAnimation 0.2s ease-out;
+    }
+  </style>
+<script type="importmap">
+{
+  "imports": {
+    "react-dom/": "https://esm.sh/react-dom@^19.1.0/",
+    "react/": "https://esm.sh/react@^19.1.0/",
+    "react": "https://esm.sh/react@^19.1.0"
+  }
+}
+</script>
+<link rel="stylesheet" href="/index.css">
+</head>
+<body class="bg-slate-800 text-slate-100">
+  <div id="root"></div>
+  <script type="module" src="/index.tsx"></script>
+</body>
+</html>
