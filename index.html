@@ -4,6 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>آزمون چهار گزینه ای</title>
+  <script src="https://cdn.tailwindcss.com"></script>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@100..900&display=swap" rel="stylesheet">
@@ -11,11 +12,11 @@
   <style>
     body {
       font-family: 'Vazirmatn', Tahoma, 'Helvetica Neue', Arial, sans-serif;
-      font-weight: 300; /* Set a lighter default font weight */
-      -webkit-font-smoothing: antialiased; /* Smoother fonts on WebKit */
-      -moz-osx-font-smoothing: grayscale; /* Smoother fonts on Firefox */
+      font-weight: 300;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
     }
-    .fade-in { /* This class is used on components for initial load animation */
+    .fade-in {
       animation: fadeInAnimation 0.2s ease-out forwards;
     }
     @keyframes fadeInAnimation {
@@ -24,7 +25,7 @@
     }
     
     @keyframes slideInFromLeftContentAnimation {
-      from { opacity: 0; transform: translateX(-30px); } /* For RTL, -ve X is from the left */
+      from { opacity: 0; transform: translateX(-30px); }
       to { opacity: 1; transform: translateX(0); }
     }
     .animate-slide-in-left-content {
@@ -60,7 +61,7 @@
 </script>
 <link rel="stylesheet" href="/index.css">
 </head>
-<body class="bg-slate-900 text-slate-100">
+<body class="bg-slate-800 text-slate-100">
   <div id="root"></div>
   <script type="module" src="/index.tsx"></script>
 </body>

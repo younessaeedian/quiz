@@ -7,7 +7,7 @@ interface QuizSetupProps {
   incorrectQuestionsCount: number;
 }
 
-// توابع و کامپوننت‌های آیکون بدون تغییر باقی می‌مانند
+// توابع و کامپوننت‌های آیکون بدون تغییر
 const toPersianDigits = (num: string | number): string => {
   const persianDigits = ['۰', '۱', '۲', '۳', '۴', '۵', '۶', '۷', '۸', '۹'];
   return String(num).replace(/[0-9]/g, (digit) => persianDigits[parseInt(digit)]);
@@ -58,11 +58,9 @@ const QuizSetup: React.FC<QuizSetupProps> = ({ onStartNewQuiz, onStartReviewQuiz
           </p>
         </div>
 
-        {/* کارت جزئیات آزمون با پس‌زمینه و پدینگ اصلاح‌شده */}
-        <div className="bg-slate-800 rounded-2xl">
-          
-          {/* آیتم با پدینگ یکسان در تمام جهات */}
-          <div className="flex items-center p-4 border-b border-slate-700">
+        {/* کارت اطلاعات آزمون با پس‌زمینه bg-slate-700 */}
+        <div className="bg-slate-900 rounded-2xl">
+          <div className="flex items-center p-4 border-b border-slate-800">
             <div className="flex items-center justify-center w-11 h-11 shrink-0 ml-4 rounded-xl bg-[#2FB5FA]/20 text-[#2FB5FA]">
               <UserIcon className="w-6 h-6" />
             </div>
@@ -72,12 +70,12 @@ const QuizSetup: React.FC<QuizSetupProps> = ({ onStartNewQuiz, onStartReviewQuiz
             </div>
           </div>
 
-          <div className="flex items-center p-4 border-b border-slate-700">
+          <div className="flex items-center p-4 border-b border-slate-800">
             <div className="flex items-center justify-center w-11 h-11 shrink-0 ml-4 rounded-xl bg-[#2FB5FA]/20 text-[#2FB5FA]">
                 <CalendarIcon className="w-6 h-6" />
             </div>
             <div className="flex-1">
-              <div className="text-sm font-medium text-slate-400 mb-0.5">تاریخ</div>
+              <div className="text-sm font-medium text-slate-400 mb-0.5">تاریخ امتحان</div>
               <div className="text-base font-semibold text-slate-100">{toPersianDigits(quizDetails.examDate)}</div>
             </div>
           </div>
@@ -87,16 +85,15 @@ const QuizSetup: React.FC<QuizSetupProps> = ({ onStartNewQuiz, onStartReviewQuiz
                 <ClockIcon className="w-6 h-6" />
             </div>
             <div className="flex-1">
-              <div className="text-sm font-medium text-slate-400 mb-0.5">ساعت</div>
+              <div className="text-sm font-medium text-slate-400 mb-0.5">ساعت برگزاری</div>
               <div className="text-base font-semibold text-slate-100">{toPersianDigits(quizDetails.examTime)}</div>
             </div>
           </div>
-          
         </div>
       </div>
       
-      {/* نوار دکمه‌ها با پس‌زمینه اصلاح‌شده */}
-      <div className="fixed bottom-0 left-0 right-0 bg-slate-900/80 backdrop-blur-sm p-4 z-30 border-t border-slate-700/50">
+      {/* نوار دکمه‌ها با پس‌زمینه bg-slate-800 */}
+      <div className="fixed bottom-0 left-0 right-0 bg-slate-800/80 backdrop-blur-sm p-4 z-30 border-t border-slate-700/50">
         <div className="max-w-xl mx-auto space-y-3">
           {incorrectQuestionsCount > 0 && (
             <button

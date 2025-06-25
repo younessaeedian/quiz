@@ -241,7 +241,7 @@ const App: React.FC = () => {
       )}
       
       {/* افزودن padding-bottom زیاد برای جلوگیری از پنهان شدن محتوا زیر دکمه‌های ثابت */}
-      <main className="w-full max-w-xl mx-auto space-y-6 pt-20 sm:pt-24 px-4 flex-grow flex flex-col pb-32">
+      <main className="w-full max-w-xl mx-auto space-y-6 pt-20 sm:pt-24 px-4 flex-grow flex flex-col pb-40">
         <div className="p-5 sm:p-6 rounded-2xl flex-grow flex flex-col">
           {renderContent()}
         </div>

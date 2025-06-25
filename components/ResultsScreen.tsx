@@ -43,10 +43,9 @@ const ResultsScreen: React.FC<ResultsScreenProps> = ({
     feedbackMessage = "عیبی نداره! دوباره شروع کن، کم‌کم پیشرفت می‌کنی و نتیجه‌شو می‌بینی.";
   }
   
-  // کلاس‌های پایه مطابق با الگوی شما
   const baseClasses = "w-full font-bold rounded-xl py-3 px-6 sm:px-8 text-base sm:text-lg";
 
-  // کلاس‌های دکمه مرور (خاکستری) - دقیقا مشابه صفحه شروع
+  // استایل دکمه مرور، دقیقاً مشابه صفحه شروع
   const reviewButtonClasses = `
     ${baseClasses}
     text-white bg-slate-700
@@ -55,7 +54,7 @@ const ResultsScreen: React.FC<ResultsScreenProps> = ({
     transform-gpu transition-transform duration-100 ease-in-out
   `;
   
-  // کلاس‌های دکمه اصلی (آبی) - دقیقا مشابه صفحه شروع
+  // استایل دکمه اصلی (آبی)، دقیقاً مشابه صفحه شروع
   const primaryButtonClasses = `
     ${baseClasses} 
     text-white bg-[#2FB5FA] 
@@ -111,13 +110,14 @@ const ResultsScreen: React.FC<ResultsScreenProps> = ({
         </div>
       </div>
 
-      <div className="fixed bottom-0 left-0 right-0 bg-slate-800/80 backdrop-blur-sm p-4 z-30">
+      {/* پس‌زمینه نوار دکمه‌ها مشابه صفحه شروع */}
+      <div className="fixed bottom-0 left-0 right-0 bg-slate-800/80 backdrop-blur-sm p-4 z-30 border-t border-slate-700/50">
         <div className="max-w-xl mx-auto space-y-3">
           {globalIncorrectCount > 0 && (
             <button
               onClick={onStartGlobalReviewQuiz}
               onTouchStart={() => {}}
-              className={reviewButtonClasses} // اعمال استایل جدید
+              className={reviewButtonClasses} 
               aria-label={`مرور ${toPersianDigits(globalIncorrectCount)} سوالی که قبلا اشتباه پاسخ داده اید`}
             >
             مرور سوال‌های غلط ({toPersianDigits(globalIncorrectCount)} سوال)
@@ -127,7 +127,7 @@ const ResultsScreen: React.FC<ResultsScreenProps> = ({
           <button
             onClick={onRestart}
             onTouchStart={() => {}}
-            className={primaryButtonClasses} // اعمال استایل جدید
+            className={primaryButtonClasses}
             aria-label="شروع دوباره آزمون"
           >
             شروع دوباره آزمون

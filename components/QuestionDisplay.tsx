@@ -12,7 +12,7 @@ interface QuestionDisplayProps {
   totalQuestions: number;
 }
 
-const AUTO_ADVANCE_DELAY_MS = 2000; 
+const AUTO_ADVANCE_DELAY_MS = 2000;
 
 const toPersianDigits = (num: string | number): string => {
   const persianDigits = ['۰', '۱', '۲', '۳', '۴', '۵', '۶', '۷', '۸', '۹'];
@@ -52,7 +52,7 @@ const QuestionDisplay: React.FC<QuestionDisplayProps> = ({
   }, [showFeedback, onNextQuestion]);
 
   const getButtonClasses = useCallback((option: string): string => {
-    const baseDuoStyle = "w-full text-right font-bold rounded-xl py-3 px-4 sm:text-lg flex items-center justify-between transform-gpu transition-transform duration-100 ease-in-out";
+    const baseDuoStyle = "w-full text-right font-bold rounded-xl py-3 px-4 flex items-center justify-between transform-gpu transition-transform duration-100 ease-in-out";
     
     if (showFeedback) {
       const isCorrectAnswer = option === question.answer;
