@@ -1,5 +1,5 @@
-import React from 'react';
-import { quizDetails } from '../data/quizinfo';
+import React from "react";
+import { quizDetails } from "../data/quizinfo";
 
 interface QuizSetupProps {
   onStartNewQuiz: () => void;
@@ -9,30 +9,59 @@ interface QuizSetupProps {
 
 // توابع و کامپوننت‌های آیکون بدون تغییر
 const toPersianDigits = (num: string | number): string => {
-  const persianDigits = ['۰', '۱', '۲', '۳', '۴', '۵', '۶', '۷', '۸', '۹'];
-  return String(num).replace(/[0-9]/g, (digit) => persianDigits[parseInt(digit)]);
+  const persianDigits = ["۰", "۱", "۲", "۳", "۴", "۵", "۶", "۷", "۸", "۹"];
+  return String(num).replace(
+    /[0-9]/g,
+    (digit) => persianDigits[parseInt(digit)]
+  );
 };
 
-const CalendarIcon: React.FC<{ className?: string }> = ({ className = "w-5 h-5" }) => (
-  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className={className}>
-    <path d="M19 4h-1V2h-2v2H8V2H6v2H5c-1.11 0-1.99.9-1.99 2L3 20a2 2 0 002 2h14c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 16H5V9h14v11zM7 11h2v2H7v-2zm4 0h2v2h-2v-2zm4 0h2v2h-2v-2z"/>
+const CalendarIcon: React.FC<{ className?: string }> = ({
+  className = "w-5 h-5",
+}) => (
+  <svg
+    xmlns="http://www.w3.org/2000/svg"
+    viewBox="0 0 24 24"
+    fill="currentColor"
+    className={className}
+  >
+    <path d="M19 4h-1V2h-2v2H8V2H6v2H5c-1.11 0-1.99.9-1.99 2L3 20a2 2 0 002 2h14c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 16H5V9h14v11zM7 11h2v2H7v-2zm4 0h2v2h-2v-2zm4 0h2v2h-2v-2z" />
   </svg>
 );
 
-const ClockIcon: React.FC<{ className?: string }> = ({ className = "w-5 h-5" }) => (
-  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className={className}>
-    <path d="M11.99 2C6.47 2 2 6.48 2 12s4.47 10 9.99 10C17.52 22 22 17.52 22 12S17.52 2 11.99 2zM12 20c-4.42 0-8-3.58-8-8s3.58-8 8-8 8 3.58 8 8-3.58 8-8 8zm.5-13H11v6l5.25 3.15.75-1.23-4.5-2.67z"/>
+const ClockIcon: React.FC<{ className?: string }> = ({
+  className = "w-5 h-5",
+}) => (
+  <svg
+    xmlns="http://www.w3.org/2000/svg"
+    viewBox="0 0 24 24"
+    fill="currentColor"
+    className={className}
+  >
+    <path d="M11.99 2C6.47 2 2 6.48 2 12s4.47 10 9.99 10C17.52 22 22 17.52 22 12S17.52 2 11.99 2zM12 20c-4.42 0-8-3.58-8-8s3.58-8 8-8 8 3.58 8 8-3.58 8-8 8zm.5-13H11v6l5.25 3.15.75-1.23-4.5-2.67z" />
   </svg>
 );
 
-const UserIcon: React.FC<{ className?: string }> = ({ className = "w-5 h-5" }) => (
-  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className={className}>
-    <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/>
+const UserIcon: React.FC<{ className?: string }> = ({
+  className = "w-5 h-5",
+}) => (
+  <svg
+    xmlns="http://www.w3.org/2000/svg"
+    viewBox="0 0 24 24"
+    fill="currentColor"
+    className={className}
+  >
+    <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z" />
   </svg>
 );
 
-const QuizSetup: React.FC<QuizSetupProps> = ({ onStartNewQuiz, onStartReviewQuiz, incorrectQuestionsCount }) => {
-  const baseClasses = "w-full font-bold rounded-xl py-3 px-6 sm:px-8 text-base sm:text-lg";
+const QuizSetup: React.FC<QuizSetupProps> = ({
+  onStartNewQuiz,
+  onStartReviewQuiz,
+  incorrectQuestionsCount,
+}) => {
+  const baseClasses =
+    "w-full font-bold rounded-xl py-3 px-6 sm:px-8 text-base sm:text-lg";
   const blueButtonClasses = `
     ${baseClasses} 
     text-white bg-[#2FB5FA] 
@@ -52,47 +81,61 @@ const QuizSetup: React.FC<QuizSetupProps> = ({ onStartNewQuiz, onStartReviewQuiz
     <>
       <div className="space-y-8 fade-in flex-grow">
         <div className="text-center space-y-3">
-          <h1 className="text-2xl sm:text-3xl font-bold text-white">{quizDetails.title}</h1>
+          <h1 className="text-2xl sm:text-3xl font-bold text-white">
+            {quizDetails.title}
+          </h1>
           <p className="text-sm text-slate-400 max-w-md mx-auto">
             این یک آزمون آزمایشی برای آمادگی شما در درس {quizDetails.title} است.
           </p>
         </div>
 
-        {/* کارت اطلاعات آزمون با پس‌زمینه bg-slate-700 */}
-        <div className="bg-slate-900 rounded-2xl">
-          <div className="flex items-center p-4 border-b border-slate-800">
-            <div className="flex items-center justify-center w-11 h-11 shrink-0 ml-4 rounded-xl bg-[#2FB5FA]/20 text-[#2FB5FA]">
+        {/* **تغییر اصلی:** رنگ پس‌زمینه کارت یک پله روشن‌تر شد */}
+        <div className="bg-slate-700 rounded-2xl">
+          <div className="flex items-center p-4 border-b border-slate-600">
+            {/* **تغییر اصلی:** رنگ پس‌زمینه آیکون‌ها همرنگ پس‌زمینه اصلی شد */}
+            <div className="flex items-center justify-center w-11 h-11 shrink-0 ml-4 rounded-xl bg-slate-800 text-[#2FB5FA]">
               <UserIcon className="w-6 h-6" />
             </div>
             <div className="flex-1">
-              <div className="text-sm font-medium text-slate-400 mb-0.5">مدرس</div>
-              <div className="text-base font-semibold text-slate-100">{quizDetails.instructorName}</div>
+              <div className="text-sm font-medium text-slate-400 mb-0.5">
+                مدرس
+              </div>
+              <div className="text-base font-semibold text-slate-100">
+                {quizDetails.instructorName}
+              </div>
             </div>
           </div>
 
-          <div className="flex items-center p-4 border-b border-slate-800">
-            <div className="flex items-center justify-center w-11 h-11 shrink-0 ml-4 rounded-xl bg-[#2FB5FA]/20 text-[#2FB5FA]">
-                <CalendarIcon className="w-6 h-6" />
+          <div className="flex items-center p-4 border-b border-slate-600">
+            <div className="flex items-center justify-center w-11 h-11 shrink-0 ml-4 rounded-xl bg-slate-800 text-[#2FB5FA]">
+              <CalendarIcon className="w-6 h-6" />
             </div>
             <div className="flex-1">
-              <div className="text-sm font-medium text-slate-400 mb-0.5">تاریخ امتحان</div>
-              <div className="text-base font-semibold text-slate-100">{toPersianDigits(quizDetails.examDate)}</div>
+              <div className="text-sm font-medium text-slate-400 mb-0.5">
+                تاریخ امتحان
+              </div>
+              <div className="text-base font-semibold text-slate-100">
+                {toPersianDigits(quizDetails.examDate)}
+              </div>
             </div>
           </div>
 
           <div className="flex items-center p-4">
-            <div className="flex items-center justify-center w-11 h-11 shrink-0 ml-4 rounded-xl bg-[#2FB5FA]/20 text-[#2FB5FA]">
-                <ClockIcon className="w-6 h-6" />
+            <div className="flex items-center justify-center w-11 h-11 shrink-0 ml-4 rounded-xl bg-slate-800 text-[#2FB5FA]">
+              <ClockIcon className="w-6 h-6" />
             </div>
             <div className="flex-1">
-              <div className="text-sm font-medium text-slate-400 mb-0.5">ساعت برگزاری</div>
-              <div className="text-base font-semibold text-slate-100">{toPersianDigits(quizDetails.examTime)}</div>
+              <div className="text-sm font-medium text-slate-400 mb-0.5">
+                ساعت برگزاری
+              </div>
+              <div className="text-base font-semibold text-slate-100">
+                {toPersianDigits(quizDetails.examTime)}
+              </div>
             </div>
           </div>
         </div>
       </div>
-      
-      {/* نوار دکمه‌ها با پس‌زمینه bg-slate-800 */}
+
       <div className="fixed bottom-0 left-0 right-0 bg-slate-800/80 backdrop-blur-sm p-4 z-30 border-t border-slate-700/50">
         <div className="max-w-xl mx-auto space-y-3">
           {incorrectQuestionsCount > 0 && (
@@ -100,9 +143,12 @@ const QuizSetup: React.FC<QuizSetupProps> = ({ onStartNewQuiz, onStartReviewQuiz
               onClick={onStartReviewQuiz}
               onTouchStart={() => {}}
               className={reviewButtonClasses}
-              aria-label={`مرور ${toPersianDigits(incorrectQuestionsCount)} سوالی که قبلا اشتباه پاسخ داده اید`}
+              aria-label={`مرور ${toPersianDigits(
+                incorrectQuestionsCount
+              )} سوالی که قبلا اشتباه پاسخ داده اید`}
             >
-            مرور سوال‌های غلط ({toPersianDigits(incorrectQuestionsCount)} سوال)
+              مرور سوال‌های غلط ({toPersianDigits(incorrectQuestionsCount)}{" "}
+              سوال)
             </button>
           )}
           <button
