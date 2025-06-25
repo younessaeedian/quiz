@@ -1,12 +1,13 @@
-import React, { useState, useCallback, useMemo, useEffect } from 'react';
-import { Question, GameState } from './types';
-import { defaultQuestions } from './data/questions';
-import QuizSetup from './components/QuizSetup';
-import QuestionDisplay from './components/QuestionDisplay';
-import ResultsScreen from './components/ResultsScreen';
-import { goodScoreAnimationData } from './data/goodScoreAnimation';
+import React, { useState, useCallback, useMemo, useEffect } from "react";
+import { SpeedInsights } from "@vercel/speed-insights/react"; // <-- این خط اضافه شد
+import { Question, GameState } from "./types";
+import { defaultQuestions } from "./data/questions";
+import QuizSetup from "./components/QuizSetup";
+import QuestionDisplay from "./components/QuestionDisplay";
+import ResultsScreen from "./components/ResultsScreen";
+import { goodScoreAnimationData } from "./data/goodScoreAnimation";
 
-const INCORRECT_QUESTION_IDS_KEY = 'interactiveQuizIncorrectQuestionIds';
+const INCORRECT_QUESTION_IDS_KEY = "interactiveQuizIncorrectQuestionIds";
 
 // الگوریتم Fisher-Yates برای درهم‌ریزی آرایه
 const shuffleArray = <T,>(array: T[]): T[] => {
@@ -20,38 +21,66 @@ const shuffleArray = <T,>(array: T[]): T[] => {
 
 // تابع کمکی برای تبدیل اعداد به فارسی
 const toPersianDigits = (num: string | number): string => {
-  const persianDigits = ['۰', '۱', '۲', '۳', '۴', '۵', '۶', '۷', '۸', '۹'];
-  return String(num).replace(/[0-9]/g, (digit) => persianDigits[parseInt(digit)]);
+  const persianDigits = ["۰", "۱", "۲", "۳", "۴", "۵", "۶", "۷", "۸", "۹"];
+  return String(num).replace(
+    /[0-9]/g,
+    (digit) => persianDigits[parseInt(digit)]
+  );
 };
 
 // کامپوننت آیکون بستن
-const CloseIcon: React.FC<{ className?: string }> = ({ className = "h-5 w-5" }) => (
-  <svg xmlns="http://www.w3.org/2000/svg" className={className} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
-    <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+const CloseIcon: React.FC<{ className?: string }> = ({
+  className = "h-5 w-5",
+}) => (
+  <svg
+    xmlns="http://www.w3.org/2000/svg"
+    className={className}
+    fill="none"
+    viewBox="0 0 24 24"
+    stroke="currentColor"
+    strokeWidth="2"
+  >
+    <path
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      d="M6 18L18 6M6 6l12 12"
+    />
   </svg>
 );
 
 const App: React.FC = () => {
   const [gameState, setGameState] = useState<GameState>(GameState.SETUP);
-  const [masterQuestionList] = useState<Question[]>(() => shuffleArray(defaultQuestions));
+  const [masterQuestionList] = useState<Question[]>(() =>
+    shuffleArray(defaultQuestions)
+  );
   const [questions, setQuestions] = useState<Question[]>([]);
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState<number>(0);
   const [score, setScore] = useState<number>(0);
   const [selectedAnswer, setSelectedAnswer] = useState<string | null>(null);
   const [showFeedback, setShowFeedback] = useState<boolean>(false);
   const [currentOptions, setCurrentOptions] = useState<string[]>([]);
-  
-  const [persistedIncorrectIds, setPersistedIncorrectIds] = useState<Set<string>>(new Set());
-  const [currentSessionIncorrectIds, setCurrentSessionIncorrectIds] = useState<Set<string>>(new Set());
+
+  const [persistedIncorrectIds, setPersistedIncorrectIds] = useState<
+    Set<string>
+  >(new Set());
+  const [currentSessionIncorrectIds, setCurrentSessionIncorrectIds] = useState<
+    Set<string>
+  >(new Set());
   const [isReviewMode, setIsReviewMode] = useState<boolean>(false);
 
   // بخش افکت‌های صوتی با مسیر صحیح
-  const correctSound = useMemo(() => new Audio('/sound/gp_correct_sound.mp3'), []);
-  const incorrectSound = useMemo(() => new Audio('/sound/gp_incorrect_sound.mp3'), []);
+  const correctSound = useMemo(
+    () => new Audio("/sound/gp_correct_sound.mp3"),
+    []
+  );
+  const incorrectSound = useMemo(
+    () => new Audio("/sound/gp_incorrect_sound.mp3"),
+    []
+  );
 
   const playSound = (audio: HTMLAudioElement) => {
     audio.currentTime = 0;
-    audio.play().catch(error => console.error("Error playing sound:", error));
+    audio.play().catch((error) => console.error("Error playing sound:", error));
   };
 
   useEffect(() => {
@@ -60,44 +89,54 @@ const App: React.FC = () => {
       try {
         const storedIds = JSON.parse(storedIdsRaw);
         if (Array.isArray(storedIds)) {
-          setPersistedIncorrectIds(new Set(storedIds.filter(id => typeof id === 'string')));
+          setPersistedIncorrectIds(
+            new Set(storedIds.filter((id) => typeof id === "string"))
+          );
         }
       } catch (error) {
-        console.error("Failed to parse incorrect question IDs from localStorage:", error);
-        localStorage.removeItem(INCORRECT_QUESTION_IDS_KEY); 
+        console.error(
+          "Failed to parse incorrect question IDs from localStorage:",
+          error
+        );
+        localStorage.removeItem(INCORRECT_QUESTION_IDS_KEY);
       }
     }
   }, []);
-  
+
   const handleRestartQuiz = useCallback(() => {
     setGameState(GameState.SETUP);
   }, []);
 
-  const startQuizInternal = useCallback((questionsToPlay: Question[], reviewMode: boolean) => {
-    if (questionsToPlay.length === 0) {
-      alert("سوالی برای این آزمون یافت نشد.");
-      setGameState(GameState.SETUP);
-      return;
-    }
-    const shuffledQuestions = shuffleArray(questionsToPlay);
-    setQuestions(shuffledQuestions);
-    setCurrentQuestionIndex(0);
-    setScore(0);
-    setSelectedAnswer(null);
-    setShowFeedback(false);
-    // گزینه‌ها مستقیماً از سوال اول در ساختار داده جدید خوانده می‌شوند
-    setCurrentOptions(shuffleArray(shuffledQuestions[0].options));
-    setIsReviewMode(reviewMode);
-    setCurrentSessionIncorrectIds(new Set());
-    setGameState(GameState.QUIZ);
-  }, []);
+  const startQuizInternal = useCallback(
+    (questionsToPlay: Question[], reviewMode: boolean) => {
+      if (questionsToPlay.length === 0) {
+        alert("سوالی برای این آزمون یافت نشد.");
+        setGameState(GameState.SETUP);
+        return;
+      }
+      const shuffledQuestions = shuffleArray(questionsToPlay);
+      setQuestions(shuffledQuestions);
+      setCurrentQuestionIndex(0);
+      setScore(0);
+      setSelectedAnswer(null);
+      setShowFeedback(false);
+      // گزینه‌ها مستقیماً از سوال اول در ساختار داده جدید خوانده می‌شوند
+      setCurrentOptions(shuffleArray(shuffledQuestions[0].options));
+      setIsReviewMode(reviewMode);
+      setCurrentSessionIncorrectIds(new Set());
+      setGameState(GameState.QUIZ);
+    },
+    []
+  );
 
   const handleStartNewQuiz = useCallback(() => {
     startQuizInternal(masterQuestionList, false);
   }, [masterQuestionList, startQuizInternal]);
 
   const handleStartReviewQuiz = useCallback(() => {
-    const incorrectQuestions = masterQuestionList.filter(q => persistedIncorrectIds.has(q.id));
+    const incorrectQuestions = masterQuestionList.filter((q) =>
+      persistedIncorrectIds.has(q.id)
+    );
     if (incorrectQuestions.length === 0) {
       alert("شما سوال غلطی برای مرور ندارید!");
       return;
@@ -105,34 +144,47 @@ const App: React.FC = () => {
     startQuizInternal(incorrectQuestions, true);
   }, [masterQuestionList, persistedIncorrectIds, startQuizInternal]);
 
-  const handleAnswerSelect = useCallback((answer: string) => {
-    if (showFeedback) return;
+  const handleAnswerSelect = useCallback(
+    (answer: string) => {
+      if (showFeedback) return;
 
-    setSelectedAnswer(answer);
-    setShowFeedback(true);
-    const currentQ = questions[currentQuestionIndex];
+      setSelectedAnswer(answer);
+      setShowFeedback(true);
+      const currentQ = questions[currentQuestionIndex];
 
-    if (answer === currentQ.answer) {
-      playSound(correctSound); // پخش صدای صحیح
-      setScore(prevScore => prevScore + 1);
-      if (isReviewMode) {
-        setCurrentSessionIncorrectIds(prev => {
-          const newSet = new Set(prev);
-          newSet.delete(currentQ.id);
-          return newSet;
-        });
-         setPersistedIncorrectIds(prev => {
-          const newSet = new Set(prev);
-          newSet.delete(currentQ.id);
-          localStorage.setItem(INCORRECT_QUESTION_IDS_KEY, JSON.stringify(Array.from(newSet)));
-          return newSet;
-        });
+      if (answer === currentQ.answer) {
+        playSound(correctSound); // پخش صدای صحیح
+        setScore((prevScore) => prevScore + 1);
+        if (isReviewMode) {
+          setCurrentSessionIncorrectIds((prev) => {
+            const newSet = new Set(prev);
+            newSet.delete(currentQ.id);
+            return newSet;
+          });
+          setPersistedIncorrectIds((prev) => {
+            const newSet = new Set(prev);
+            newSet.delete(currentQ.id);
+            localStorage.setItem(
+              INCORRECT_QUESTION_IDS_KEY,
+              JSON.stringify(Array.from(newSet))
+            );
+            return newSet;
+          });
+        }
+      } else {
+        playSound(incorrectSound); // پخش صدای غلط
+        setCurrentSessionIncorrectIds((prev) => new Set(prev).add(currentQ.id));
       }
-    } else {
-      playSound(incorrectSound); // پخش صدای غلط
-      setCurrentSessionIncorrectIds(prev => new Set(prev).add(currentQ.id));
-    }
-  }, [showFeedback, questions, currentQuestionIndex, isReviewMode, correctSound, incorrectSound]);
+    },
+    [
+      showFeedback,
+      questions,
+      currentQuestionIndex,
+      isReviewMode,
+      correctSound,
+      incorrectSound,
+    ]
+  );
 
   const handleNextQuestion = useCallback(() => {
     setShowFeedback(false);
@@ -145,14 +197,25 @@ const App: React.FC = () => {
       setCurrentOptions(shuffleArray(questions[nextIndex].options));
     } else {
       if (!isReviewMode) {
-        const combinedIncorrectIds = new Set([...persistedIncorrectIds, ...currentSessionIncorrectIds]);
-        localStorage.setItem(INCORRECT_QUESTION_IDS_KEY, JSON.stringify(Array.from(combinedIncorrectIds)));
+        const combinedIncorrectIds = new Set([
+          ...persistedIncorrectIds,
+          ...currentSessionIncorrectIds,
+        ]);
+        localStorage.setItem(
+          INCORRECT_QUESTION_IDS_KEY,
+          JSON.stringify(Array.from(combinedIncorrectIds))
+        );
         setPersistedIncorrectIds(combinedIncorrectIds);
       }
       setGameState(GameState.RESULTS);
     }
-  }, [currentQuestionIndex, questions, isReviewMode, persistedIncorrectIds, currentSessionIncorrectIds]);
-
+  }, [
+    currentQuestionIndex,
+    questions,
+    isReviewMode,
+    persistedIncorrectIds,
+    currentSessionIncorrectIds,
+  ]);
 
   const currentQuestion = useMemo(() => {
     if (questions.length > 0 && currentQuestionIndex < questions.length) {
@@ -172,7 +235,8 @@ const App: React.FC = () => {
           />
         );
       case GameState.QUIZ:
-        if (!currentQuestion) return <p className="text-center p-8">در حال بارگذاری سوالات...</p>;
+        if (!currentQuestion)
+          return <p className="text-center p-8">در حال بارگذاری سوالات...</p>;
         return (
           <QuestionDisplay
             question={currentQuestion}
@@ -209,7 +273,7 @@ const App: React.FC = () => {
   return (
     <div className="min-h-screen text-slate-100 flex flex-col items-center">
       {gameState === GameState.QUIZ && (
-         <div className="fixed top-0 left-0 right-0 mt-6 z-50 px-4 fade-in">
+        <div className="fixed top-0 left-0 right-0 mt-6 z-50 px-4 fade-in">
           <div className="flex items-center justify-between w-full h-10">
             <button
               onClick={handleRestartQuiz}
@@ -226,7 +290,9 @@ const App: React.FC = () => {
                 aria-valuenow={progress}
                 aria-valuemin={0}
                 aria-valuemax={100}
-                aria-label={`پیشرفت آزمون: ${toPersianDigits(Math.round(progress))}%`}
+                aria-label={`پیشرفت آزمون: ${toPersianDigits(
+                  Math.round(progress)
+                )}%`}
               >
                 <div
                   className="bg-[#2FB5FA] h-2.5 rounded-full transition-all duration-300 ease-out"
@@ -234,18 +300,24 @@ const App: React.FC = () => {
                 ></div>
               </div>
             </div>
-            
+
             <div className="w-7 shrink-0"></div>
           </div>
         </div>
       )}
-      
-      {/* افزودن padding-bottom زیاد برای جلوگیری از پنهان شدن محتوا زیر دکمه‌های ثابت */}
-      <main className="w-full max-w-xl mx-auto space-y-6 pt-20 sm:pt-24 px-4 flex-grow flex flex-col pb-40">
-        <div className="p-5 sm:p-6 rounded-2xl flex-grow flex flex-col">
+
+      <main
+        className={`w-full max-w-xl mx-auto space-y-6 pt-20 sm:pt-24 flex-grow flex flex-col ${
+          gameState === GameState.QUIZ ? "pb-6" : "pb-40"
+        }`}
+      >
+        <div className="p-4 rounded-2xl flex-grow flex flex-col">
           {renderContent()}
         </div>
       </main>
+
+      {/* **تغییر اصلی:** کامپوننت SpeedInsights اضافه شد */}
+      <SpeedInsights />
     </div>
   );
 };
