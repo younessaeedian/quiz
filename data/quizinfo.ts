@@ -7,7 +7,7 @@ export interface QuizInfo {
 }
 
 export const quizDetails: QuizInfo = {
-  title: "آزمون آمادگی درس تاریخ اسلام",
+  title: "آزمون آمادگی تاریخ اسلام",
   instructorName: "حسن فضل",
   examDate: "1404/04/26",
   examTime: "10:00"

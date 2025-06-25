@@ -7,6 +7,7 @@ interface QuizSetupProps {
   incorrectQuestionsCount: number;
 }
 
+// توابع و کامپوننت‌های آیکون بدون تغییر باقی می‌مانند
 const toPersianDigits = (num: string | number): string => {
   const persianDigits = ['۰', '۱', '۲', '۳', '۴', '۵', '۶', '۷', '۸', '۹'];
   return String(num).replace(/[0-9]/g, (digit) => persianDigits[parseInt(digit)]);
@@ -30,12 +31,8 @@ const UserIcon: React.FC<{ className?: string }> = ({ className = "w-5 h-5" }) =
   </svg>
 );
 
-
 const QuizSetup: React.FC<QuizSetupProps> = ({ onStartNewQuiz, onStartReviewQuiz, incorrectQuestionsCount }) => {
-  // کلاس‌های پایه شامل اندازه و فونت
   const baseClasses = "w-full font-bold rounded-xl py-3 px-6 sm:px-8 text-base sm:text-lg";
-
-  // کلاس‌های دکمه آبی با تکنیک نهایی
   const blueButtonClasses = `
     ${baseClasses} 
     text-white bg-[#2FB5FA] 
@@ -43,8 +40,6 @@ const QuizSetup: React.FC<QuizSetupProps> = ({ onStartNewQuiz, onStartReviewQuiz
     active:translate-y-[2px] active:border-b-2
     transform-gpu transition-transform duration-100 ease-in-out
   `;
-
-  // کلاس‌های دکمه مرور (خاکستری) با تکنیک نهایی
   const reviewButtonClasses = `
     ${baseClasses}
     text-white bg-slate-700
@@ -53,38 +48,55 @@ const QuizSetup: React.FC<QuizSetupProps> = ({ onStartNewQuiz, onStartReviewQuiz
     transform-gpu transition-transform duration-100 ease-in-out
   `;
 
-
   return (
     <>
       <div className="space-y-8 fade-in flex-grow">
         <div className="text-center space-y-3">
-          {/* تغییر رنگ عنوان اصلی به سفید */}
           <h1 className="text-2xl sm:text-3xl font-bold text-white">{quizDetails.title}</h1>
           <p className="text-sm text-slate-400 max-w-md mx-auto">
             این یک آزمون آزمایشی برای آمادگی شما در درس {quizDetails.title} است.
           </p>
         </div>
 
-        <div className="space-y-2 text-sm text-slate-300 border border-slate-700 p-4 rounded-2xl bg-slate-800/30">
-          <div className="flex items-center space-x-2 space-x-reverse">
-            <UserIcon className="w-5 h-5 text-[#2FB5FA]" />
-            <span className="font-semibold w-16">مدرس:</span>
-            <span>{quizDetails.instructorName}</span>
+        {/* کارت جزئیات آزمون با پس‌زمینه و پدینگ اصلاح‌شده */}
+        <div className="bg-slate-800 rounded-2xl">
+          
+          {/* آیتم با پدینگ یکسان در تمام جهات */}
+          <div className="flex items-center p-4 border-b border-slate-700">
+            <div className="flex items-center justify-center w-11 h-11 shrink-0 ml-4 rounded-xl bg-[#2FB5FA]/20 text-[#2FB5FA]">
+              <UserIcon className="w-6 h-6" />
+            </div>
+            <div className="flex-1">
+              <div className="text-sm font-medium text-slate-400 mb-0.5">مدرس</div>
+              <div className="text-base font-semibold text-slate-100">{quizDetails.instructorName}</div>
+            </div>
           </div>
-          <div className="flex items-center space-x-2 space-x-reverse">
-            <CalendarIcon className="w-5 h-5 text-[#2FB5FA]" />
-            <span className="font-semibold w-16">تاریخ:</span>
-            <span>{toPersianDigits(quizDetails.examDate)}</span>
+
+          <div className="flex items-center p-4 border-b border-slate-700">
+            <div className="flex items-center justify-center w-11 h-11 shrink-0 ml-4 rounded-xl bg-[#2FB5FA]/20 text-[#2FB5FA]">
+                <CalendarIcon className="w-6 h-6" />
+            </div>
+            <div className="flex-1">
+              <div className="text-sm font-medium text-slate-400 mb-0.5">تاریخ</div>
+              <div className="text-base font-semibold text-slate-100">{toPersianDigits(quizDetails.examDate)}</div>
+            </div>
           </div>
-          <div className="flex items-center space-x-2 space-x-reverse">
-            <ClockIcon className="w-5 h-5 text-[#2FB5FA]" />
-            <span className="font-semibold w-16">ساعت:</span>
-            <span>{toPersianDigits(quizDetails.examTime)}</span>
+
+          <div className="flex items-center p-4">
+            <div className="flex items-center justify-center w-11 h-11 shrink-0 ml-4 rounded-xl bg-[#2FB5FA]/20 text-[#2FB5FA]">
+                <ClockIcon className="w-6 h-6" />
+            </div>
+            <div className="flex-1">
+              <div className="text-sm font-medium text-slate-400 mb-0.5">ساعت</div>
+              <div className="text-base font-semibold text-slate-100">{toPersianDigits(quizDetails.examTime)}</div>
+            </div>
           </div>
+          
         </div>
       </div>
-
-      <div className="fixed bottom-0 left-0 right-0 bg-slate-800/80 backdrop-blur-sm p-4 z-30">
+      
+      {/* نوار دکمه‌ها با پس‌زمینه اصلاح‌شده */}
+      <div className="fixed bottom-0 left-0 right-0 bg-slate-900/80 backdrop-blur-sm p-4 z-30 border-t border-slate-700/50">
         <div className="max-w-xl mx-auto space-y-3">
           {incorrectQuestionsCount > 0 && (
             <button
