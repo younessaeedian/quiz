@@ -1,5 +1,5 @@
 import React, { useState, useCallback, useMemo, useEffect } from "react";
-import { SpeedInsights } from "@vercel/speed-insights/react"; // <-- این خط اضافه شد
+import { SpeedInsights } from "@vercel/speed-insights/react";
 import { Question, GameState } from "./types";
 import { defaultQuestions } from "./data/questions";
 import QuizSetup from "./components/QuizSetup";
@@ -8,6 +8,7 @@ import ResultsScreen from "./components/ResultsScreen";
 import { goodScoreAnimationData } from "./data/goodScoreAnimation";
 
 const INCORRECT_QUESTION_IDS_KEY = "interactiveQuizIncorrectQuestionIds";
+const ACTIVE_QUIZ_STATE_KEY = "activeQuizState"; // کلید برای ذخیره وضعیت آزمون
 
 // الگوریتم Fisher-Yates برای درهم‌ریزی آرایه
 const shuffleArray = <T,>(array: T[]): T[] => {
@@ -68,7 +69,6 @@ const App: React.FC = () => {
   >(new Set());
   const [isReviewMode, setIsReviewMode] = useState<boolean>(false);
 
-  // بخش افکت‌های صوتی با مسیر صحیح
   const correctSound = useMemo(
     () => new Audio("/sound/gp_correct_sound.mp3"),
     []
@@ -83,7 +83,39 @@ const App: React.FC = () => {
     audio.play().catch((error) => console.error("Error playing sound:", error));
   };
 
+  // **افزودن قابلیت بازیابی وضعیت از localStorage هنگام بارگذاری اولیه**
   useEffect(() => {
+    const savedStateJSON = localStorage.getItem(ACTIVE_QUIZ_STATE_KEY);
+    if (savedStateJSON) {
+      try {
+        const savedState = JSON.parse(savedStateJSON);
+        if (
+          savedState.gameState === GameState.QUIZ &&
+          Array.isArray(savedState.questions) &&
+          savedState.questions.length > 0
+        ) {
+          setQuestions(savedState.questions);
+          setCurrentQuestionIndex(savedState.currentQuestionIndex);
+          setScore(savedState.score || 0);
+          setIsReviewMode(savedState.isReviewMode || false);
+          setCurrentSessionIncorrectIds(
+            new Set(savedState.currentSessionIncorrectIds || [])
+          );
+          setCurrentOptions(
+            shuffleArray(
+              savedState.questions[savedState.currentQuestionIndex].options
+            )
+          );
+          setGameState(GameState.QUIZ);
+        } else {
+          localStorage.removeItem(ACTIVE_QUIZ_STATE_KEY);
+        }
+      } catch (e) {
+        console.error("Failed to parse saved state, removing it.", e);
+        localStorage.removeItem(ACTIVE_QUIZ_STATE_KEY);
+      }
+    }
+
     const storedIdsRaw = localStorage.getItem(INCORRECT_QUESTION_IDS_KEY);
     if (storedIdsRaw) {
       try {
@@ -101,9 +133,32 @@ const App: React.FC = () => {
         localStorage.removeItem(INCORRECT_QUESTION_IDS_KEY);
       }
     }
-  }, []);
+  }, []); // این useEffect فقط یک بار اجرا می‌شود
+
+  // **افزودن قابلیت ذخیره وضعیت در localStorage در حین آزمون**
+  useEffect(() => {
+    if (gameState === GameState.QUIZ && questions.length > 0) {
+      const stateToSave = {
+        gameState,
+        questions,
+        currentQuestionIndex,
+        score,
+        isReviewMode,
+        currentSessionIncorrectIds: Array.from(currentSessionIncorrectIds),
+      };
+      localStorage.setItem(ACTIVE_QUIZ_STATE_KEY, JSON.stringify(stateToSave));
+    }
+  }, [
+    gameState,
+    questions,
+    currentQuestionIndex,
+    score,
+    isReviewMode,
+    currentSessionIncorrectIds,
+  ]);
 
   const handleRestartQuiz = useCallback(() => {
+    localStorage.removeItem(ACTIVE_QUIZ_STATE_KEY); // پاک کردن وضعیت آزمون
     setGameState(GameState.SETUP);
   }, []);
 
@@ -114,13 +169,13 @@ const App: React.FC = () => {
         setGameState(GameState.SETUP);
         return;
       }
+      localStorage.removeItem(ACTIVE_QUIZ_STATE_KEY); // پاک کردن وضعیت قبلی
       const shuffledQuestions = shuffleArray(questionsToPlay);
       setQuestions(shuffledQuestions);
       setCurrentQuestionIndex(0);
       setScore(0);
       setSelectedAnswer(null);
       setShowFeedback(false);
-      // گزینه‌ها مستقیماً از سوال اول در ساختار داده جدید خوانده می‌شوند
       setCurrentOptions(shuffleArray(shuffledQuestions[0].options));
       setIsReviewMode(reviewMode);
       setCurrentSessionIncorrectIds(new Set());
@@ -153,7 +208,7 @@ const App: React.FC = () => {
       const currentQ = questions[currentQuestionIndex];
 
       if (answer === currentQ.answer) {
-        playSound(correctSound); // پخش صدای صحیح
+        playSound(correctSound);
         setScore((prevScore) => prevScore + 1);
         if (isReviewMode) {
           setCurrentSessionIncorrectIds((prev) => {
@@ -172,7 +227,7 @@ const App: React.FC = () => {
           });
         }
       } else {
-        playSound(incorrectSound); // پخش صدای غلط
+        playSound(incorrectSound);
         setCurrentSessionIncorrectIds((prev) => new Set(prev).add(currentQ.id));
       }
     },
@@ -193,7 +248,6 @@ const App: React.FC = () => {
     if (currentQuestionIndex < questions.length - 1) {
       const nextIndex = currentQuestionIndex + 1;
       setCurrentQuestionIndex(nextIndex);
-      // گزینه‌های سوال بعدی مستقیماً خوانده می‌شوند
       setCurrentOptions(shuffleArray(questions[nextIndex].options));
     } else {
       if (!isReviewMode) {
@@ -207,6 +261,7 @@ const App: React.FC = () => {
         );
         setPersistedIncorrectIds(combinedIncorrectIds);
       }
+      localStorage.removeItem(ACTIVE_QUIZ_STATE_KEY); // پاک کردن وضعیت در انتهای آزمون
       setGameState(GameState.RESULTS);
     }
   }, [
@@ -316,7 +371,6 @@ const App: React.FC = () => {
         </div>
       </main>
 
-      {/* **تغییر اصلی:** کامپوننت SpeedInsights اضافه شد */}
       <SpeedInsights />
     </div>
   );
