@@ -83,7 +83,6 @@ const App: React.FC = () => {
     audio.play().catch((error) => console.error("Error playing sound:", error));
   };
 
-  // **افزودن قابلیت بازیابی وضعیت از localStorage هنگام بارگذاری اولیه**
   useEffect(() => {
     const savedStateJSON = localStorage.getItem(ACTIVE_QUIZ_STATE_KEY);
     if (savedStateJSON) {
@@ -133,9 +132,8 @@ const App: React.FC = () => {
         localStorage.removeItem(INCORRECT_QUESTION_IDS_KEY);
       }
     }
-  }, []); // این useEffect فقط یک بار اجرا می‌شود
+  }, []);
 
-  // **افزودن قابلیت ذخیره وضعیت در localStorage در حین آزمون**
   useEffect(() => {
     if (gameState === GameState.QUIZ && questions.length > 0) {
       const stateToSave = {
@@ -158,7 +156,7 @@ const App: React.FC = () => {
   ]);
 
   const handleRestartQuiz = useCallback(() => {
-    localStorage.removeItem(ACTIVE_QUIZ_STATE_KEY); // پاک کردن وضعیت آزمون
+    localStorage.removeItem(ACTIVE_QUIZ_STATE_KEY);
     setGameState(GameState.SETUP);
   }, []);
 
@@ -169,7 +167,7 @@ const App: React.FC = () => {
         setGameState(GameState.SETUP);
         return;
       }
-      localStorage.removeItem(ACTIVE_QUIZ_STATE_KEY); // پاک کردن وضعیت قبلی
+      localStorage.removeItem(ACTIVE_QUIZ_STATE_KEY);
       const shuffledQuestions = shuffleArray(questionsToPlay);
       setQuestions(shuffledQuestions);
       setCurrentQuestionIndex(0);
@@ -261,7 +259,7 @@ const App: React.FC = () => {
         );
         setPersistedIncorrectIds(combinedIncorrectIds);
       }
-      localStorage.removeItem(ACTIVE_QUIZ_STATE_KEY); // پاک کردن وضعیت در انتهای آزمون
+      localStorage.removeItem(ACTIVE_QUIZ_STATE_KEY);
       setGameState(GameState.RESULTS);
     }
   }, [
@@ -330,17 +328,19 @@ const App: React.FC = () => {
       {gameState === GameState.QUIZ && (
         <div className="fixed top-0 left-0 right-0 mt-6 z-50 px-4 fade-in">
           <div className="flex items-center justify-between w-full h-10">
+            {/* **تغییر اصلی:** رنگ پس‌زمینه دکمه بستن */}
             <button
               onClick={handleRestartQuiz}
-              className="p-1.5 bg-slate-700/80 backdrop-blur-sm hover:bg-slate-600/80 text-slate-300 hover:text-white rounded-full focus:outline-none focus:ring-2 focus:ring-slate-500 shrink-0"
+              className="p-1.5 bg-[#202F36] hover:bg-gray-600/80 text-gray-300 hover:text-white rounded-full focus:outline-none focus:ring-2 focus:ring-gray-500 shrink-0"
               aria-label="بستن آزمون و بازگشت به شروع"
             >
               <CloseIcon className="h-4 w-4" />
             </button>
 
             <div className="flex-grow mx-2">
+              {/* **تغییر اصلی:** رنگ پس‌زمینه نوار پیشرفت */}
               <div
-                className="bg-slate-700/80 backdrop-blur-sm rounded-full h-2.5 shadow-lg w-full max-w-xs mx-auto"
+                className="bg-[#202F36] rounded-full h-2.5 shadow-lg w-full max-w-xs mx-auto"
                 role="progressbar"
                 aria-valuenow={progress}
                 aria-valuemin={0}
@@ -349,8 +349,9 @@ const App: React.FC = () => {
                   Math.round(progress)
                 )}%`}
               >
+                {/* **تغییر اصلی:** رنگ نوار پیشرفت */}
                 <div
-                  className="bg-[#2FB5FA] h-2.5 rounded-full transition-all duration-300 ease-out"
+                  className="bg-[#49C0F8] h-2.5 rounded-full transition-all duration-300 ease-out"
                   style={{ width: `${progress}%` }}
                 ></div>
               </div>
@@ -361,12 +362,8 @@ const App: React.FC = () => {
         </div>
       )}
 
-      <main
-        className={`w-full max-w-xl mx-auto space-y-6 pt-20 sm:pt-24 flex-grow flex flex-col ${
-          gameState === GameState.QUIZ ? "pb-6" : "pb-40"
-        }`}
-      >
-        <div className="p-4 rounded-2xl flex-grow flex flex-col">
+      <main className="w-full max-w-xl mx-auto space-y-6 pt-20 sm:pt-24 px-4 flex-grow flex flex-col pb-40">
+        <div className="p-5 sm:p-6 rounded-2xl flex-grow flex flex-col">
           {renderContent()}
         </div>
       </main>

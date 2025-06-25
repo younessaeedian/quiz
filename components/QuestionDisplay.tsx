@@ -26,14 +26,27 @@ const CheckIcon: React.FC<{ className?: string }> = ({
   className = "h-5 w-5",
 }) => (
   <svg
-    xmlns="http://www.w3.org/2000/svg"
-    className={className}
-    fill="none"
+    width="24"
+    height="24"
     viewBox="0 0 24 24"
-    stroke="currentColor"
-    strokeWidth="3"
+    fill="none"
+    xmlns="http://www.w3.org/2000/svg"
   >
-    <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+    <g clip-path="url(#clip0_2310_43)">
+      <rect width="24" height="24" rx="6" fill="#1EAAF2" />
+      <path
+        d="M17.319 8.44788L10.2071 15.5521L6.68115 12.0261"
+        stroke="white"
+        stroke-width="2.15721"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+      />
+    </g>
+    <defs>
+      <clipPath id="clip0_2310_43">
+        <rect width="24" height="24" fill="white" />
+      </clipPath>
+    </defs>
   </svg>
 );
 
@@ -41,18 +54,26 @@ const CrossIcon: React.FC<{ className?: string }> = ({
   className = "h-5 w-5",
 }) => (
   <svg
-    xmlns="http://www.w3.org/2000/svg"
-    className={className}
-    fill="none"
+    width="24"
+    height="24"
     viewBox="0 0 24 24"
-    stroke="currentColor"
-    strokeWidth="3"
+    fill="none"
+    xmlns="http://www.w3.org/2000/svg"
   >
-    <path
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      d="M6 18L18 6M6 6l12 12"
-    />
+    <g clip-path="url(#clip0_2310_35)">
+      <rect width="24" height="24" rx="6" fill="#D84848" />
+      <path
+        d="M8.44395 8.44788L15.5559 15.5521M15.5558 8.44788L8.44385 15.5521"
+        stroke="white"
+        stroke-width="2.15721"
+        stroke-linecap="round"
+      />
+    </g>
+    <defs>
+      <clipPath id="clip0_2310_35">
+        <rect width="24" height="24" fill="white" />
+      </clipPath>
+    </defs>
   </svg>
 );
 
@@ -79,7 +100,7 @@ const QuestionDisplay: React.FC<QuestionDisplayProps> = ({
   const getButtonClasses = useCallback(
     (option: string): string => {
       const baseDuoStyle =
-        "w-full text-right font-bold rounded-xl py-3 px-4 flex items-center justify-between transform-gpu transition-transform duration-100 ease-in-out";
+        "w-full text-right font-bold rounded-2xl py-3 px-4 flex items-center justify-between transform-gpu transition-transform duration-100 ease-in-out";
 
       if (showFeedback) {
         const isCorrectAnswer = option === question.answer;
@@ -90,10 +111,11 @@ const QuestionDisplay: React.FC<QuestionDisplayProps> = ({
         } else if (isSelected) {
           return `${baseDuoStyle} bg-red-500/[.15] text-white border-2 border-red-500 border-b-[4px] border-b-red-500 cursor-default animate-shake`;
         } else {
-          return `${baseDuoStyle} bg-transparent text-slate-400 border-2 border-slate-600 border-b-[4px] border-b-slate-600 opacity-60 cursor-not-allowed`;
+          return `${baseDuoStyle} bg-transparent text-gray-400 border-2 border-gray-600 border-b-[4px] border-b-gray-600 opacity-60 cursor-not-allowed`;
         }
       } else {
-        return `${baseDuoStyle} bg-transparent text-slate-100 border-2 border-slate-700 border-b-[4px] active:translate-y-[2px] cursor-pointer`;
+        // **تغییر اصلی:** بازگرداندن حالت سه‌بعدی با حفظ رنگ‌های جدید
+        return `${baseDuoStyle} bg-transparent text-gray-100 border-2 border-[#38464F] border-b-[4px] active:translate-y-[2px] cursor-pointer`;
       }
     },
     [showFeedback, selectedAnswer, question.answer]
@@ -112,13 +134,13 @@ const QuestionDisplay: React.FC<QuestionDisplayProps> = ({
 
   return (
     <div className="space-y-6 fade-in pt-2 sm:pt-4 flex flex-col flex-grow">
-      <div className="text-center text-sm text-slate-400 mb-3 sm:mb-4">
+      <div className="text-center text-sm text-gray-400 mb-3 sm:mb-4">
         سوال {toPersianDigits(currentQuestionNumber)} از{" "}
         {toPersianDigits(totalQuestions)}
       </div>
       <h2
         key={question.id + "-text"}
-        className="text-lg sm:text-xl font-semibold text-slate-100 mb-4 sm:mb-6 text-right leading-relaxed animate-slide-in-left-content"
+        className="text-lg sm:text-xl font-semibold text-gray-100 mb-4 sm:mb-6 text-right leading-relaxed animate-slide-in-left-content"
         style={{ minHeight: "4.5em" }}
       >
         {question.question}
@@ -146,7 +168,6 @@ const QuestionDisplay: React.FC<QuestionDisplayProps> = ({
               aria-label={getAriaLabel(option)}
               aria-live={showFeedback ? "polite" : "off"}
             >
-              {/* **تغییر اصلی:** بزرگ کردن فونت گزینه‌ها */}
               <span className="flex-1 text-right font-medium text-base sm:text-lg">
                 {option}
               </span>
