@@ -76,20 +76,29 @@ const QuestionDisplay: React.FC<QuestionDisplayProps> = ({
       const baseDuoStyle =
         "w-full text-right font-bold rounded-2xl py-3 px-4 flex items-center justify-between transform-gpu transition-transform duration-100 ease-in-out";
 
+      // --- حالت نمایش بازخورد (بعد از انتخاب پاسخ) ---
       if (showFeedback) {
-        const isCorrectAnswer = option === question.answer;
-        const isSelected = option === selectedAnswer;
+        const isCorrectOption = option === question.answer;
+        const isSelectedOption = option === selectedAnswer;
 
-        if (isCorrectAnswer) {
+        // اگر گزینه انتخاب شده، صحیح باشد
+        if (isSelectedOption && isCorrectOption) {
           return `${baseDuoStyle} bg-[#3F85A7]/[.10] text-[#49C0F8] border-2 border-[#3F85A7] border-b-[4px] border-b-[#3F85A7] cursor-default animate-correct-pulse`;
-        } else if (isSelected) {
-          return `${baseDuoStyle} bg-[#FD6868]/[.10] text-[#FD6868] border-2 border-[#A63C3B] border-b-[4px] border-b-[#A63C3B] `;
-        } else {
-          return `${baseDuoStyle} bg-transparent text-gray-400 border-2 border-gray-600 border-b-[4px] border-b-gray-600 opacity-60 cursor-not-allowed`;
         }
-      } else {
-        return `${baseDuoStyle} bg-transparent text-gray-100 border-2 border-[#38464F] border-b-[4px] active:translate-y-[2px] cursor-pointer`;
+        // اگر گزینه انتخاب شده، غلط باشد
+        if (isSelectedOption && !isCorrectOption) {
+          return `${baseDuoStyle} bg-[#FD6868]/[.10] text-[#FD6868] border-2 border-[#A63C3B] border-b-[4px] border-b-[#A63C3B] animate-shake`;
+        }
+        // اگر این گزینه، پاسخ صحیح است (اما انتخاب نشده)
+        if (isCorrectOption && !isSelectedOption) {
+          return `${baseDuoStyle} bg-[#3F85A7]/[.10] text-[#49C0F8] border-2 border-[#3F85A7] border-b-[4px] border-b-[#3F85A7] cursor-default`; // بدون انیمیشن
+        }
+        // سایر گزینه های غلط و انتخاب نشده
+        return `${baseDuoStyle} bg-transparent text-gray-400 border-2 border-gray-600 border-b-[4px] border-b-gray-600 opacity-60 cursor-not-allowed`;
       }
+
+      // --- حالت اولیه (قبل از انتخاب پاسخ) ---
+      return `${baseDuoStyle} bg-transparent text-gray-100 border-2 border-[#38464F] border-b-[4px] active:translate-y-[2px] cursor-pointer`;
     },
     [showFeedback, selectedAnswer, question.answer]
   );
