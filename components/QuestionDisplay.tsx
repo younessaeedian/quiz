@@ -12,7 +12,7 @@ interface QuestionDisplayProps {
   totalQuestions: number;
 }
 
-const AUTO_ADVANCE_DELAY_MS = 2000;
+const AUTO_ADVANCE_DELAY_MS = 2500;
 
 const toPersianDigits = (num: string | number): string => {
   const persianDigits = ["۰", "۱", "۲", "۳", "۴", "۵", "۶", "۷", "۸", "۹"];
@@ -31,46 +31,20 @@ const CheckIcon: React.FC<{ className?: string }> = ({
     viewBox="0 0 24 24"
     fill="none"
     xmlns="http://www.w3.org/2000/svg"
+    className={className}
   >
-    <g clip-path="url(#clip0_2310_43)">
-      <rect width="24" height="24" rx="6" fill="#1EAAF2" />
+    <g clipPath="url(#clip0_2310_43)">
+      <rect width="24" height="24" rx="6" fill="#49C0F8" />
       <path
         d="M17.319 8.44788L10.2071 15.5521L6.68115 12.0261"
-        stroke="white"
-        stroke-width="2.15721"
-        stroke-linecap="round"
-        stroke-linejoin="round"
+        stroke="#141F23"
+        strokeWidth="2.15721"
+        strokeLinecap="round"
+        strokeLinejoin="round"
       />
     </g>
     <defs>
       <clipPath id="clip0_2310_43">
-        <rect width="24" height="24" fill="white" />
-      </clipPath>
-    </defs>
-  </svg>
-);
-
-const CrossIcon: React.FC<{ className?: string }> = ({
-  className = "h-5 w-5",
-}) => (
-  <svg
-    width="24"
-    height="24"
-    viewBox="0 0 24 24"
-    fill="none"
-    xmlns="http://www.w3.org/2000/svg"
-  >
-    <g clip-path="url(#clip0_2310_35)">
-      <rect width="24" height="24" rx="6" fill="#D84848" />
-      <path
-        d="M8.44395 8.44788L15.5559 15.5521M15.5558 8.44788L8.44385 15.5521"
-        stroke="white"
-        stroke-width="2.15721"
-        stroke-linecap="round"
-      />
-    </g>
-    <defs>
-      <clipPath id="clip0_2310_35">
         <rect width="24" height="24" fill="white" />
       </clipPath>
     </defs>
@@ -97,6 +71,14 @@ const QuestionDisplay: React.FC<QuestionDisplayProps> = ({
     return () => clearTimeout(timer);
   }, [showFeedback, onNextQuestion]);
 
+  const handleOptionClick = (option: string) => {
+    // **تغییر اصلی:** ایجاد ویبره در صورت پشتیبانی مرورگر
+    if (navigator.vibrate) {
+      navigator.vibrate(50); // ویبره به مدت ۵۰ میلی‌ثانیه
+    }
+    onAnswerSelect(option);
+  };
+
   const getButtonClasses = useCallback(
     (option: string): string => {
       const baseDuoStyle =
@@ -107,14 +89,13 @@ const QuestionDisplay: React.FC<QuestionDisplayProps> = ({
         const isSelected = option === selectedAnswer;
 
         if (isCorrectAnswer) {
-          return `${baseDuoStyle} bg-[#2FB5FA]/[0.15] text-white border-2 border-[#2FB5FA] border-b-[4px] border-b-[#2595c7] cursor-default animate-correct-pulse`;
+          return `${baseDuoStyle} bg-[#3F85A7]/[.10] text-[#49C0F8] border-2 border-[#3F85A7] border-b-[4px] border-b-[#3F85A7] cursor-default animate-correct-pulse`;
         } else if (isSelected) {
-          return `${baseDuoStyle} bg-red-500/[.15] text-white border-2 border-red-500 border-b-[4px] border-b-red-500 cursor-default animate-shake`;
+          return `${baseDuoStyle} bg-[#FD6868]/[.10] text-[#FD6868] border-2 border-[#A63C3B] border-b-[4px] border-b-[#A63C3B] `;
         } else {
           return `${baseDuoStyle} bg-transparent text-gray-400 border-2 border-gray-600 border-b-[4px] border-b-gray-600 opacity-60 cursor-not-allowed`;
         }
       } else {
-        // **تغییر اصلی:** بازگرداندن حالت سه‌بعدی با حفظ رنگ‌های جدید
         return `${baseDuoStyle} bg-transparent text-gray-100 border-2 border-[#38464F] border-b-[4px] active:translate-y-[2px] cursor-pointer`;
       }
     },
@@ -153,15 +134,11 @@ const QuestionDisplay: React.FC<QuestionDisplayProps> = ({
         {options.map((option, index) => {
           const buttonClasses = getButtonClasses(option);
           const isCorrectChoice = showFeedback && option === question.answer;
-          const isSelectedIncorrectChoice =
-            showFeedback &&
-            option === selectedAnswer &&
-            option !== question.answer;
 
           return (
             <button
               key={index}
-              onClick={() => onAnswerSelect(option)}
+              onClick={() => handleOptionClick(option)} // **تغییر اصلی:** استفاده از تابع جدید
               onTouchStart={() => {}}
               className={buttonClasses}
               disabled={showFeedback}
@@ -172,10 +149,7 @@ const QuestionDisplay: React.FC<QuestionDisplayProps> = ({
                 {option}
               </span>
               {isCorrectChoice && (
-                <CheckIcon className="h-5 w-5 sm:h-6 sm:w-6 text-white ms-2 me-1" />
-              )}
-              {isSelectedIncorrectChoice && (
-                <CrossIcon className="h-5 w-5 sm:h-6 sm:w-6 text-white ms-2 me-1" />
+                <CheckIcon className="h-5 w-5 sm:h-6 sm:w-6 ms-2 me-1" />
               )}
             </button>
           );
