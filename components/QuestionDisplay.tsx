@@ -38,7 +38,7 @@ const CheckIcon: React.FC<{ className?: string }> = ({
       <path
         d="M17.319 8.44788L10.2071 15.5521L6.68115 12.0261"
         stroke="#141F23"
-        strokeWidth="2.15721"
+        strokeWidth="3"
         strokeLinecap="round"
         strokeLinejoin="round"
       />
@@ -109,13 +109,11 @@ const QuestionDisplay: React.FC<QuestionDisplayProps> = ({
   };
 
   return (
-    // ===== اصلاح کلیدی چیدمان و انیمیشن =====
-    // 1. key={question.id} برای اجرای انیمیشن تمیز و بدون باگ
-    // 2. justify-center برای وسط‌چین کردن عمودی محتوا
-    <div key={question.id} className="fade-in flex flex-col justify-center flex-grow">
-      {/* این کانتینر داخلی برای گروه‌بندی سوال و گزینه‌هاست */}
-      <div>
-        <div className="text-center text-sm text-gray-400 mb-3 sm:mb-4 pt-20">
+    // تغییر ۱: div اصلی برای وسط‌چین کردن عمودی کل بلوک سوال
+    <div className="flex flex-col justify-center flex-grow">
+      {/* تغییر ۲: این div کل بلوک سوال را در بر می‌گیرد و انیمیشن می‌گیرد */}
+      <div key={question.id} className="fade-in">
+        <div className="text-center text-sm text-gray-400 mb-3 sm:mb-4">
           سوال {toPersianDigits(currentQuestionNumber)} از{" "}
           {toPersianDigits(totalQuestions)}
         </div>
@@ -125,8 +123,6 @@ const QuestionDisplay: React.FC<QuestionDisplayProps> = ({
         >
           {question.question}
         </h2>
-
-        {/* 3. حذف mt-auto برای جلوگیری از چسبیدن به پایین */}
         <div className="space-y-3">
           {options.map((option, index) => {
             const buttonClasses = getButtonClasses(option);
@@ -153,7 +149,7 @@ const QuestionDisplay: React.FC<QuestionDisplayProps> = ({
           })}
         </div>
       </div>
-      
+
       <footer className="fixed bottom-8 left-4 right-4 text-center z-20">
         <a
           href="https://t.me/unuos"
