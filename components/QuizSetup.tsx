@@ -1,5 +1,6 @@
 import React from "react";
 import { quizDetails } from "../data/quizinfo";
+import VibrationTester from "./VibrationTester"; // ابزار تست ویبره اضافه شد
 
 interface QuizSetupProps {
   onStartNewQuiz: () => void;
@@ -61,11 +62,11 @@ const QuizSetup: React.FC<QuizSetupProps> = ({
   incorrectQuestionsCount,
 }) => {
   const baseClasses =
-    "w-full font-bold rounded-2xl py-3 px-6 sm:px-8 text-base sm:text-lg";
+    "w-full font-bold rounded-xl py-3 px-6 sm:px-8 text-base sm:text-lg";
   const blueButtonClasses = `
     ${baseClasses} 
-    text-gray-900 bg-[#49C0F8] 
-    border-b-4 border-[#1898D5]
+    text-white bg-indigo-600 
+    border-b-4 border-indigo-800
     active:translate-y-[2px] active:border-b-2
     transform-gpu transition-transform duration-100 ease-in-out
   `;
@@ -89,9 +90,9 @@ const QuizSetup: React.FC<QuizSetupProps> = ({
           </p>
         </div>
 
-        <div className="bg-[#202F36] rounded-2xl">
+        <div className="bg-gray-800 rounded-2xl">
           <div className="flex items-center p-4 border-b border-gray-700">
-            <div className="flex items-center justify-center w-11 h-11 shrink-0 ml-4 rounded-xl bg-[#374951] text-white">
+            <div className="flex items-center justify-center w-11 h-11 shrink-0 ml-4 rounded-xl bg-gray-700 text-white">
               <UserIcon className="w-6 h-6" />
             </div>
             <div className="flex-1">
@@ -105,7 +106,7 @@ const QuizSetup: React.FC<QuizSetupProps> = ({
           </div>
 
           <div className="flex items-center p-4 border-b border-gray-700">
-            <div className="flex items-center justify-center w-11 h-11 shrink-0 ml-4 rounded-xl bg-[#374951] text-white">
+            <div className="flex items-center justify-center w-11 h-11 shrink-0 ml-4 rounded-xl bg-gray-700 text-white">
               <CalendarIcon className="w-6 h-6" />
             </div>
             <div className="flex-1">
@@ -119,7 +120,7 @@ const QuizSetup: React.FC<QuizSetupProps> = ({
           </div>
 
           <div className="flex items-center p-4">
-            <div className="flex items-center justify-center w-11 h-11 shrink-0 ml-4 rounded-xl bg-[#374951] text-white">
+            <div className="flex items-center justify-center w-11 h-11 shrink-0 ml-4 rounded-xl bg-gray-700 text-white">
               <ClockIcon className="w-6 h-6" />
             </div>
             <div className="flex-1">
@@ -132,9 +133,12 @@ const QuizSetup: React.FC<QuizSetupProps> = ({
             </div>
           </div>
         </div>
+
+        {/* ابزار تست ویبره در اینجا نمایش داده می‌شود */}
+        <VibrationTester />
       </div>
 
-      <div className="fixed bottom-0 left-0 right-0 bg-[#141F23]/80 backdrop-blur-sm p-4 z-30 border-t border-gray-800/50">
+      <div className="fixed bottom-0 left-0 right-0 bg-gray-900/80 backdrop-blur-sm p-4 z-30 border-t border-gray-800/50">
         <div className="max-w-xl mx-auto space-y-3">
           {incorrectQuestionsCount > 0 && (
             <button
@@ -155,7 +159,7 @@ const QuizSetup: React.FC<QuizSetupProps> = ({
             className={blueButtonClasses}
             aria-label="شروع آزمون جدید"
           >
-            شروع آزمون
+            شروع آزمون جدید
           </button>
         </div>
       </div>
