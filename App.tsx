@@ -331,7 +331,7 @@ const App: React.FC = () => {
       )}
 
       {/* ===== کانتینر اصلی با فاصله‌گذاری صحیح ===== */}
-      <main className="w-full max-w-xl mx-auto flex-grow flex flex-col px-4">
+      <main className="w-full max-w-xl mx-auto flex-grow flex flex-col px-4 overflow-x-hidden">
         {renderContent()}
       </main>
 
