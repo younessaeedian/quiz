@@ -71,14 +71,6 @@ const QuestionDisplay: React.FC<QuestionDisplayProps> = ({
     return () => clearTimeout(timer);
   }, [showFeedback, onNextQuestion]);
 
-  const handleOptionClick = (option: string) => {
-    // **تغییر اصلی:** ایجاد ویبره در صورت پشتیبانی مرورگر
-    if (navigator.vibrate) {
-      navigator.vibrate(50); // ویبره به مدت ۵۰ میلی‌ثانیه
-    }
-    onAnswerSelect(option);
-  };
-
   const getButtonClasses = useCallback(
     (option: string): string => {
       const baseDuoStyle =
@@ -138,7 +130,7 @@ const QuestionDisplay: React.FC<QuestionDisplayProps> = ({
           return (
             <button
               key={index}
-              onClick={() => handleOptionClick(option)} // **تغییر اصلی:** استفاده از تابع جدید
+              onClick={() => onAnswerSelect(option)}
               onTouchStart={() => {}}
               className={buttonClasses}
               disabled={showFeedback}

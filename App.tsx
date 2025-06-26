@@ -8,9 +8,8 @@ import ResultsScreen from "./components/ResultsScreen";
 import { goodScoreAnimationData } from "./data/goodScoreAnimation";
 
 const INCORRECT_QUESTION_IDS_KEY = "interactiveQuizIncorrectQuestionIds";
-const ACTIVE_QUIZ_STATE_KEY = "activeQuizState"; // کلید برای ذخیره وضعیت آزمون
+const ACTIVE_QUIZ_STATE_KEY = "activeQuizState";
 
-// الگوریتم Fisher-Yates برای درهم‌ریزی آرایه
 const shuffleArray = <T,>(array: T[]): T[] => {
   const newArray = [...array];
   for (let i = newArray.length - 1; i > 0; i--) {
@@ -20,7 +19,6 @@ const shuffleArray = <T,>(array: T[]): T[] => {
   return newArray;
 };
 
-// تابع کمکی برای تبدیل اعداد به فارسی
 const toPersianDigits = (num: string | number): string => {
   const persianDigits = ["۰", "۱", "۲", "۳", "۴", "۵", "۶", "۷", "۸", "۹"];
   return String(num).replace(
@@ -29,7 +27,6 @@ const toPersianDigits = (num: string | number): string => {
   );
 };
 
-// کامپوننت آیکون بستن
 const CloseIcon: React.FC<{ className?: string }> = ({
   className = "h-5 w-5",
 }) => (
@@ -64,9 +61,6 @@ const App: React.FC = () => {
   const [persistedIncorrectIds, setPersistedIncorrectIds] = useState<
     Set<string>
   >(new Set());
-  const [currentSessionIncorrectIds, setCurrentSessionIncorrectIds] = useState<
-    Set<string>
-  >(new Set());
   const [isReviewMode, setIsReviewMode] = useState<boolean>(false);
 
   const correctSound = useMemo(
@@ -97,9 +91,6 @@ const App: React.FC = () => {
           setCurrentQuestionIndex(savedState.currentQuestionIndex);
           setScore(savedState.score || 0);
           setIsReviewMode(savedState.isReviewMode || false);
-          setCurrentSessionIncorrectIds(
-            new Set(savedState.currentSessionIncorrectIds || [])
-          );
           setCurrentOptions(
             shuffleArray(
               savedState.questions[savedState.currentQuestionIndex].options
@@ -142,18 +133,10 @@ const App: React.FC = () => {
         currentQuestionIndex,
         score,
         isReviewMode,
-        currentSessionIncorrectIds: Array.from(currentSessionIncorrectIds),
       };
       localStorage.setItem(ACTIVE_QUIZ_STATE_KEY, JSON.stringify(stateToSave));
     }
-  }, [
-    gameState,
-    questions,
-    currentQuestionIndex,
-    score,
-    isReviewMode,
-    currentSessionIncorrectIds,
-  ]);
+  }, [gameState, questions, currentQuestionIndex, score, isReviewMode]);
 
   const handleRestartQuiz = useCallback(() => {
     localStorage.removeItem(ACTIVE_QUIZ_STATE_KEY);
@@ -176,7 +159,6 @@ const App: React.FC = () => {
       setShowFeedback(false);
       setCurrentOptions(shuffleArray(shuffledQuestions[0].options));
       setIsReviewMode(reviewMode);
-      setCurrentSessionIncorrectIds(new Set());
       setGameState(GameState.QUIZ);
     },
     []
@@ -209,11 +191,6 @@ const App: React.FC = () => {
         playSound(correctSound);
         setScore((prevScore) => prevScore + 1);
         if (isReviewMode) {
-          setCurrentSessionIncorrectIds((prev) => {
-            const newSet = new Set(prev);
-            newSet.delete(currentQ.id);
-            return newSet;
-          });
           setPersistedIncorrectIds((prev) => {
             const newSet = new Set(prev);
             newSet.delete(currentQ.id);
@@ -226,7 +203,18 @@ const App: React.FC = () => {
         }
       } else {
         playSound(incorrectSound);
-        setCurrentSessionIncorrectIds((prev) => new Set(prev).add(currentQ.id));
+        // **تغییر اصلی:** ثبت فوری سوال غلط در آزمون اصلی
+        if (!isReviewMode) {
+          setPersistedIncorrectIds((prev) => {
+            const newSet = new Set(prev);
+            newSet.add(currentQ.id);
+            localStorage.setItem(
+              INCORRECT_QUESTION_IDS_KEY,
+              JSON.stringify(Array.from(newSet))
+            );
+            return newSet;
+          });
+        }
       }
     },
     [
@@ -248,27 +236,11 @@ const App: React.FC = () => {
       setCurrentQuestionIndex(nextIndex);
       setCurrentOptions(shuffleArray(questions[nextIndex].options));
     } else {
-      if (!isReviewMode) {
-        const combinedIncorrectIds = new Set([
-          ...persistedIncorrectIds,
-          ...currentSessionIncorrectIds,
-        ]);
-        localStorage.setItem(
-          INCORRECT_QUESTION_IDS_KEY,
-          JSON.stringify(Array.from(combinedIncorrectIds))
-        );
-        setPersistedIncorrectIds(combinedIncorrectIds);
-      }
+      // **تغییر اصلی:** حذف منطق ادغام در انتهای آزمون
       localStorage.removeItem(ACTIVE_QUIZ_STATE_KEY);
       setGameState(GameState.RESULTS);
     }
-  }, [
-    currentQuestionIndex,
-    questions,
-    isReviewMode,
-    persistedIncorrectIds,
-    currentSessionIncorrectIds,
-  ]);
+  }, [currentQuestionIndex, questions]);
 
   const currentQuestion = useMemo(() => {
     if (questions.length > 0 && currentQuestionIndex < questions.length) {
@@ -328,7 +300,6 @@ const App: React.FC = () => {
       {gameState === GameState.QUIZ && (
         <div className="fixed top-0 left-0 right-0 mt-6 z-50 px-4 fade-in">
           <div className="flex items-center justify-between w-full h-10">
-            {/* **تغییر اصلی:** رنگ پس‌زمینه دکمه بستن */}
             <button
               onClick={handleRestartQuiz}
               className="p-1.5 bg-[#202F36] hover:bg-gray-600/80 text-gray-300 hover:text-white rounded-full focus:outline-none focus:ring-2 focus:ring-gray-500 shrink-0"
@@ -338,7 +309,6 @@ const App: React.FC = () => {
             </button>
 
             <div className="flex-grow mx-2">
-              {/* **تغییر اصلی:** رنگ پس‌زمینه نوار پیشرفت */}
               <div
                 className="bg-[#202F36] rounded-full h-2.5 shadow-lg w-full max-w-xs mx-auto"
                 role="progressbar"
@@ -349,7 +319,6 @@ const App: React.FC = () => {
                   Math.round(progress)
                 )}%`}
               >
-                {/* **تغییر اصلی:** رنگ نوار پیشرفت */}
                 <div
                   className="bg-[#49C0F8] h-2.5 rounded-full transition-all duration-300 ease-out"
                   style={{ width: `${progress}%` }}
