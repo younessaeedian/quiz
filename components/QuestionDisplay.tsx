@@ -150,7 +150,7 @@ const QuestionDisplay: React.FC<QuestionDisplayProps> = ({
         </div>
       </div>
 
-      <footer className="fixed bottom-8 left-4 right-4 text-center z-20">
+      <footer className="fixed bottom-4 left-4 right-4 text-center z-20">
         <a
           href="https://t.me/unuos"
           target="_blank"
