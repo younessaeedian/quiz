@@ -1,10 +1,6 @@
 import React, { useEffect, useRef } from "react";
-
-declare global {
-  interface Window {
-    lottie?: any;
-  }
-}
+import lottie from "lottie-web"; // وارد کردن Lottie از پکیج نصب شده
+import { goodScoreAnimationData } from "../data/goodScoreAnimation";
 
 interface ResultsScreenProps {
   score: number;
@@ -12,7 +8,6 @@ interface ResultsScreenProps {
   onRestart: () => void;
   onStartGlobalReviewQuiz: () => void;
   globalIncorrectCount: number;
-  animationData?: string;
 }
 
 const toPersianDigits = (num: string | number): string => {
@@ -29,7 +24,6 @@ const ResultsScreen: React.FC<ResultsScreenProps> = ({
   onRestart,
   onStartGlobalReviewQuiz,
   globalIncorrectCount,
-  animationData,
 }) => {
   const animationContainerRef = useRef<HTMLDivElement>(null);
   const gradeValue =
@@ -73,15 +67,10 @@ const ResultsScreen: React.FC<ResultsScreenProps> = ({
   useEffect(() => {
     let anim: any = null;
 
-    if (
-      isGoodScore &&
-      animationData &&
-      animationContainerRef.current &&
-      window.lottie
-    ) {
+    if (isGoodScore && animationContainerRef.current) {
       try {
-        const parsedAnimationData = JSON.parse(animationData);
-        anim = window.lottie.loadAnimation({
+        const parsedAnimationData = JSON.parse(goodScoreAnimationData);
+        anim = lottie.loadAnimation({
           container: animationContainerRef.current,
           renderer: "svg",
           loop: true,
@@ -98,12 +87,12 @@ const ResultsScreen: React.FC<ResultsScreenProps> = ({
         anim.destroy();
       }
     };
-  }, [isGoodScore, animationData]);
+  }, [isGoodScore]);
 
   return (
     <>
       <div className="space-y-6 text-center fade-in flex-grow flex flex-col justify-center">
-        {isGoodScore && animationData && (
+        {isGoodScore && (
           <div
             ref={animationContainerRef}
             className="w-48 h-48 sm:w-56 sm:h-56 mx-auto mb-3"
@@ -126,8 +115,6 @@ const ResultsScreen: React.FC<ResultsScreenProps> = ({
           <p className="text-gray-300 mt-4 mb-6">{feedbackMessage}</p>
         </div>
       </div>
-
-      {/* ===== تغییر ۴: تنظیم فاصله ۱۶ پیکسلی کناره‌ها و ۳۲ پیکسلی پایین ===== */}
       <div className="fixed bottom-0 left-0 right-0 bg-gray-800/80 backdrop-blur-sm px-4 pt-4 pb-8 z-30 border-t border-gray-700/50">
         <div className="max-w-xl mx-auto space-y-3">
           {globalIncorrectCount > 0 && (
@@ -142,7 +129,6 @@ const ResultsScreen: React.FC<ResultsScreenProps> = ({
               مرور سوال‌های غلط ({toPersianDigits(globalIncorrectCount)} سوال)
             </button>
           )}
-
           <button
             onClick={onRestart}
             onTouchStart={() => {}}

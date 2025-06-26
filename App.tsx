@@ -1,11 +1,19 @@
-import React, { useState, useCallback, useMemo, useEffect } from "react";
+import React, {
+  useState,
+  useCallback,
+  useMemo,
+  useEffect,
+  Suspense,
+  lazy,
+} from "react";
 import { SpeedInsights } from "@vercel/speed-insights/react";
 import { Question, GameState } from "./types";
 import { defaultQuestions } from "./data/questions";
 import QuizSetup from "./components/QuizSetup";
 import QuestionDisplay from "./components/QuestionDisplay";
-import ResultsScreen from "./components/ResultsScreen";
-import { goodScoreAnimationData } from "./data/goodScoreAnimation";
+
+// وارد کردن کامپوننت صفحه نتایج به صورت lazy برای بهینه‌سازی سرعت لود
+const ResultsScreen = lazy(() => import("./components/ResultsScreen"));
 
 const INCORRECT_QUESTION_IDS_KEY = "interactiveQuizIncorrectQuestionIds";
 const ACTIVE_QUIZ_STATE_KEY = "activeQuizState";
@@ -274,14 +282,21 @@ const App: React.FC = () => {
         );
       case GameState.RESULTS:
         return (
-          <ResultsScreen
-            score={score}
-            totalQuestions={questions.length}
-            onRestart={handleRestartQuiz}
-            onStartGlobalReviewQuiz={handleStartReviewQuiz}
-            globalIncorrectCount={persistedIncorrectIds.size}
-            animationData={goodScoreAnimationData}
-          />
+          <Suspense
+            fallback={
+              <div className="flex-grow flex items-center justify-center">
+                <p>درحال آماده‌سازی نتایج...</p>
+              </div>
+            }
+          >
+            <ResultsScreen
+              score={score}
+              totalQuestions={questions.length}
+              onRestart={handleRestartQuiz}
+              onStartGlobalReviewQuiz={handleStartReviewQuiz}
+              globalIncorrectCount={persistedIncorrectIds.size}
+            />
+          </Suspense>
         );
       default:
         return null;
@@ -295,7 +310,6 @@ const App: React.FC = () => {
 
   return (
     <div className="min-h-screen text-slate-100 flex flex-col">
-      {/* ===== هدر ثابت با فاصله ۳۲ پیکسلی از بالا ===== */}
       {gameState === GameState.QUIZ && (
         <header className="fixed top-8 left-4 right-4 z-50">
           <div className="flex items-center justify-between w-full max-w-xl mx-auto h-10">
@@ -306,7 +320,6 @@ const App: React.FC = () => {
             >
               <CloseIcon className="w-4 w-4" />
             </button>
-
             <div className="flex-grow mx-4">
               <div
                 className="bg-[#202F36] rounded-full h-2.5 shadow-lg w-full"
@@ -324,13 +337,12 @@ const App: React.FC = () => {
                 ></div>
               </div>
             </div>
-
             <div className="w-7 shrink-0"></div>
           </div>
         </header>
       )}
 
-      {/* ===== کانتینر اصلی با فاصله‌گذاری صحیح ===== */}
+      {/* کلاس overflow-x-hidden برای جلوگیری از اسکرول افقی هنگام انیمیشن اضافه شده است */}
       <main className="w-full max-w-xl mx-auto flex-grow flex flex-col px-4 overflow-x-hidden">
         {renderContent()}
       </main>
