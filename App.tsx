@@ -203,7 +203,6 @@ const App: React.FC = () => {
         }
       } else {
         playSound(incorrectSound);
-        // **تغییر اصلی:** ثبت فوری سوال غلط در آزمون اصلی
         if (!isReviewMode) {
           setPersistedIncorrectIds((prev) => {
             const newSet = new Set(prev);
@@ -236,7 +235,6 @@ const App: React.FC = () => {
       setCurrentQuestionIndex(nextIndex);
       setCurrentOptions(shuffleArray(questions[nextIndex].options));
     } else {
-      // **تغییر اصلی:** حذف منطق ادغام در انتهای آزمون
       localStorage.removeItem(ACTIVE_QUIZ_STATE_KEY);
       setGameState(GameState.RESULTS);
     }
@@ -296,21 +294,22 @@ const App: React.FC = () => {
   }, [gameState, currentQuestionIndex, questions.length]);
 
   return (
-    <div className="min-h-screen text-slate-100 flex flex-col items-center">
+    <div className="min-h-screen text-slate-100 flex flex-col">
+      {/* ===== هدر ثابت با فاصله ۳۲ پیکسلی از بالا ===== */}
       {gameState === GameState.QUIZ && (
-        <div className="fixed top-0 left-0 right-0 mt-6 z-50 px-4 fade-in">
-          <div className="flex items-center justify-between w-full h-10">
+        <header className="fixed top-8 left-4 right-4 z-50">
+          <div className="flex items-center justify-between w-full max-w-xl mx-auto h-10">
             <button
               onClick={handleRestartQuiz}
               className="p-1.5 bg-[#202F36] hover:bg-gray-600/80 text-gray-300 hover:text-white rounded-full focus:outline-none focus:ring-2 focus:ring-gray-500 shrink-0"
               aria-label="بستن آزمون و بازگشت به شروع"
             >
-              <CloseIcon className="h-4 w-4" />
+              <CloseIcon className="w-4 w-4" />
             </button>
 
-            <div className="flex-grow mx-2">
+            <div className="flex-grow mx-4">
               <div
-                className="bg-[#202F36] rounded-full h-2.5 shadow-lg w-full max-w-xs mx-auto"
+                className="bg-[#202F36] rounded-full h-2.5 shadow-lg w-full"
                 role="progressbar"
                 aria-valuenow={progress}
                 aria-valuemin={0}
@@ -328,13 +327,12 @@ const App: React.FC = () => {
 
             <div className="w-7 shrink-0"></div>
           </div>
-        </div>
+        </header>
       )}
 
-      <main className="w-full max-w-xl mx-auto space-y-6 pt-20 sm:pt-24 px-4 flex-grow flex flex-col pb-40">
-        <div className="p-5 sm:p-6 rounded-2xl flex-grow flex flex-col">
-          {renderContent()}
-        </div>
+      {/* ===== کانتینر اصلی با فاصله‌گذاری صحیح ===== */}
+      <main className="w-full max-w-xl mx-auto flex-grow flex flex-col px-4">
+        {renderContent()}
       </main>
 
       <SpeedInsights />

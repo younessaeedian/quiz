@@ -53,21 +53,22 @@ const ResultsScreen: React.FC<ResultsScreenProps> = ({
 
   const baseClasses =
     "w-full font-bold rounded-2xl py-3 px-6 sm:px-8 text-base sm:text-lg";
-  const blueButtonClasses = `
-    ${baseClasses} 
-    text-[#141F23] bg-[#49C0F8] 
-    border-b-4 border-[#1898D5]
-    active:translate-y-[2px] active:border-b-2
-    transform-gpu transition-transform duration-100 ease-in-out
-  `;
+
   const reviewButtonClasses = `
-    ${baseClasses} 
+    ${baseClasses}
     text-gray-100 bg-transparent
-    border-2 border-[#38464F] border-b-[4px]
+    border-2 border-[#38464F] border-b-[4px] border-b-[#38464F]
     active:translate-y-[2px]
     transform-gpu transition-transform duration-100 ease-in-out
   `;
 
+  const primaryButtonClasses = `
+    ${baseClasses} 
+    text-gray-900 bg-[#49C0F8] 
+    border-b-4 border-[#1898D5]
+    active:translate-y-[2px] active:border-b-2
+    transform-gpu transition-transform duration-100 ease-in-out
+  `;
 
   useEffect(() => {
     let anim: any = null;
@@ -116,20 +117,18 @@ const ResultsScreen: React.FC<ResultsScreenProps> = ({
             <span className="font-bold">{toPersianDigits(gradeValue)}</span> از{" "}
             {toPersianDigits(20)}
           </h2>
-          {/* **تغییر اصلی:** جایگزینی slate با gray */}
           <p className="text-xl text-gray-200 mt-2">
             <span className="font-bold">{toPersianDigits(score)}</span> پاسخ
             درست از{" "}
             <span className="font-bold">{toPersianDigits(totalQuestions)}</span>{" "}
             سوال
           </p>
-          {/* **تغییر اصلی:** جایگزینی slate با gray */}
           <p className="text-gray-300 mt-4 mb-6">{feedbackMessage}</p>
         </div>
       </div>
 
-      {/* **تغییر اصلی:** جایگزینی slate با gray */}
-      <div className="fixed bottom-0 left-0 right-0 bg-gray-800/80 backdrop-blur-sm p-4 z-30 border-t border-gray-700/50">
+      {/* ===== تغییر ۴: تنظیم فاصله ۱۶ پیکسلی کناره‌ها و ۳۲ پیکسلی پایین ===== */}
+      <div className="fixed bottom-0 left-0 right-0 bg-gray-800/80 backdrop-blur-sm px-4 pt-4 pb-8 z-30 border-t border-gray-700/50">
         <div className="max-w-xl mx-auto space-y-3">
           {globalIncorrectCount > 0 && (
             <button

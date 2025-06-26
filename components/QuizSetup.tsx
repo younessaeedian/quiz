@@ -7,7 +7,6 @@ interface QuizSetupProps {
   incorrectQuestionsCount: number;
 }
 
-// توابع و کامپوننت‌های آیکون بدون تغییر
 const toPersianDigits = (num: string | number): string => {
   const persianDigits = ["۰", "۱", "۲", "۳", "۴", "۵", "۶", "۷", "۸", "۹"];
   return String(num).replace(
@@ -62,6 +61,16 @@ const QuizSetup: React.FC<QuizSetupProps> = ({
 }) => {
   const baseClasses =
     "w-full font-bold rounded-2xl py-3 px-6 sm:px-8 text-base sm:text-lg";
+  
+  // ===== تغییر اصلی در اینجا اعمال شده است =====
+  const reviewButtonClasses = `
+    ${baseClasses}
+    bg-transparent text-gray-100 
+    border-2 border-[#38464F] border-b-[4px] 
+    active:translate-y-[2px] cursor-pointer
+    transform-gpu transition-transform duration-100 ease-in-out
+  `;
+
   const blueButtonClasses = `
     ${baseClasses} 
     text-[#141F23] bg-[#49C0F8] 
@@ -69,17 +78,10 @@ const QuizSetup: React.FC<QuizSetupProps> = ({
     active:translate-y-[2px] active:border-b-2
     transform-gpu transition-transform duration-100 ease-in-out
   `;
-  const reviewButtonClasses = `
-    ${baseClasses} 
-    text-gray-100 bg-transparent
-    border-2 border-[#38464F] border-b-[4px]
-    active:translate-y-[2px]
-    transform-gpu transition-transform duration-100 ease-in-out
-  `;
 
   return (
-    <>
-      <div className="space-y-8 fade-in flex-grow">
+    <div className="flex-grow flex flex-col justify-between h-full">
+      <div className="fade-in flex-grow flex flex-col justify-center space-y-8">
         <div className="text-center space-y-3">
           <h1 className="text-2xl sm:text-3xl font-bold text-white">
             {quizDetails.title}
@@ -134,8 +136,8 @@ const QuizSetup: React.FC<QuizSetupProps> = ({
         </div>
       </div>
 
-      <div className="fixed bottom-0 left-0 right-0 bg-[#141F23]/80 backdrop-blur-sm p-4 z-30 border-t border-gray-800/50">
-        <div className="max-w-xl mx-auto space-y-3">
+      <div className="pt-4 pb-8">
+        <div className="space-y-3">
           {incorrectQuestionsCount > 0 && (
             <button
               onClick={onStartReviewQuiz}
@@ -159,7 +161,7 @@ const QuizSetup: React.FC<QuizSetupProps> = ({
           </button>
         </div>
       </div>
-    </>
+    </div>
   );
 };
 

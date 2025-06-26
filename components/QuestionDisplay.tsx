@@ -38,7 +38,7 @@ const CheckIcon: React.FC<{ className?: string }> = ({
       <path
         d="M17.319 8.44788L10.2071 15.5521L6.68115 12.0261"
         stroke="#141F23"
-        strokeWidth="3.5"
+        strokeWidth="2.15721"
         strokeLinecap="round"
         strokeLinejoin="round"
       />
@@ -76,28 +76,22 @@ const QuestionDisplay: React.FC<QuestionDisplayProps> = ({
       const baseDuoStyle =
         "w-full text-right font-bold rounded-2xl py-3 px-4 flex items-center justify-between transform-gpu transition-transform duration-100 ease-in-out";
 
-      // --- حالت نمایش بازخورد (بعد از انتخاب پاسخ) ---
       if (showFeedback) {
         const isCorrectOption = option === question.answer;
         const isSelectedOption = option === selectedAnswer;
 
-        // اگر گزینه انتخاب شده، صحیح باشد
         if (isSelectedOption && isCorrectOption) {
           return `${baseDuoStyle} bg-[#3F85A7]/[.10] text-[#49C0F8] border-2 border-[#3F85A7] border-b-[4px] border-b-[#3F85A7] cursor-default animate-correct-pulse`;
         }
-        // اگر گزینه انتخاب شده، غلط باشد
         if (isSelectedOption && !isCorrectOption) {
           return `${baseDuoStyle} bg-[#FD6868]/[.10] text-[#FD6868] border-2 border-[#A63C3B] border-b-[4px] border-b-[#A63C3B] animate-shake`;
         }
-        // اگر این گزینه، پاسخ صحیح است (اما انتخاب نشده)
         if (isCorrectOption && !isSelectedOption) {
-          return `${baseDuoStyle} bg-[#3F85A7]/[.10] text-[#49C0F8] border-2 border-[#3F85A7] border-b-[4px] border-b-[#3F85A7] cursor-default`; // بدون انیمیشن
+          return `${baseDuoStyle} bg-[#3F85A7]/[.10] text-[#49C0F8] border-2 border-[#3F85A7] border-b-[4px] border-b-[#3F85A7] cursor-default`;
         }
-        // سایر گزینه های غلط و انتخاب نشده
         return `${baseDuoStyle} bg-transparent text-gray-400 border-2 border-gray-600 border-b-[4px] border-b-gray-600 opacity-60 cursor-not-allowed`;
       }
 
-      // --- حالت اولیه (قبل از انتخاب پاسخ) ---
       return `${baseDuoStyle} bg-transparent text-gray-100 border-2 border-[#38464F] border-b-[4px] active:translate-y-[2px] cursor-pointer`;
     },
     [showFeedback, selectedAnswer, question.answer]
@@ -115,47 +109,61 @@ const QuestionDisplay: React.FC<QuestionDisplayProps> = ({
   };
 
   return (
-    <div className="space-y-6 fade-in pt-2 sm:pt-4 flex flex-col flex-grow">
-      <div className="text-center text-sm text-gray-400 mb-3 sm:mb-4">
-        سوال {toPersianDigits(currentQuestionNumber)} از{" "}
-        {toPersianDigits(totalQuestions)}
-      </div>
-      <h2
-        key={question.id + "-text"}
-        className="text-lg sm:text-xl font-semibold text-gray-100 mb-4 sm:mb-6 text-right leading-relaxed animate-slide-in-left-content"
-        style={{ minHeight: "4.5em" }}
-      >
-        {question.question}
-      </h2>
+    // ===== اصلاح کلیدی چیدمان و انیمیشن =====
+    // 1. key={question.id} برای اجرای انیمیشن تمیز و بدون باگ
+    // 2. justify-center برای وسط‌چین کردن عمودی محتوا
+    <div key={question.id} className="fade-in flex flex-col justify-center flex-grow">
+      {/* این کانتینر داخلی برای گروه‌بندی سوال و گزینه‌هاست */}
+      <div>
+        <div className="text-center text-sm text-gray-400 mb-3 sm:mb-4 pt-20">
+          سوال {toPersianDigits(currentQuestionNumber)} از{" "}
+          {toPersianDigits(totalQuestions)}
+        </div>
+        <h2
+          className="text-lg sm:text-xl font-semibold text-gray-100 mb-4 sm:mb-6 text-right leading-relaxed"
+          style={{ minHeight: "4.5em" }}
+        >
+          {question.question}
+        </h2>
 
-      <div
-        key={question.id + "-options"}
-        className="space-y-3 animate-slide-in-left-content flex-grow flex flex-col justify-end"
-      >
-        {options.map((option, index) => {
-          const buttonClasses = getButtonClasses(option);
-          const isCorrectChoice = showFeedback && option === question.answer;
+        {/* 3. حذف mt-auto برای جلوگیری از چسبیدن به پایین */}
+        <div className="space-y-3">
+          {options.map((option, index) => {
+            const buttonClasses = getButtonClasses(option);
+            const isCorrectChoice = showFeedback && option === question.answer;
 
-          return (
-            <button
-              key={index}
-              onClick={() => onAnswerSelect(option)}
-              onTouchStart={() => {}}
-              className={buttonClasses}
-              disabled={showFeedback}
-              aria-label={getAriaLabel(option)}
-              aria-live={showFeedback ? "polite" : "off"}
-            >
-              <span className="flex-1 text-right font-medium text-base sm:text-lg">
-                {option}
-              </span>
-              {isCorrectChoice && (
-                <CheckIcon className="h-5 w-5 sm:h-6 sm:w-6 ms-2" />
-              )}
-            </button>
-          );
-        })}
+            return (
+              <button
+                key={index}
+                onClick={() => onAnswerSelect(option)}
+                onTouchStart={() => {}}
+                className={buttonClasses}
+                disabled={showFeedback}
+                aria-label={getAriaLabel(option)}
+                aria-live={showFeedback ? "polite" : "off"}
+              >
+                <span className="flex-1 text-right font-medium text-base sm:text-lg">
+                  {option}
+                </span>
+                {isCorrectChoice && (
+                  <CheckIcon className="h-5 w-5 sm:h-6 sm:w-6 ms-2" />
+                )}
+              </button>
+            );
+          })}
+        </div>
       </div>
+      
+      <footer className="fixed bottom-8 left-4 right-4 text-center z-20">
+        <a
+          href="https://t.me/unuos"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="text-xs text-gray-600 hover:text-gray-400 transition-colors"
+        >
+          Developed by Younes Saeedian
+        </a>
+      </footer>
     </div>
   );
 };
