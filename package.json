@@ -16,7 +16,7 @@
     "react-dom": "^19.1.0"
   },
   "devDependencies": {
-    "@types/lottie-web": "^5.12.7",
+    "lottie-web": "^5.13.0",
     "@types/node": "^22.14.0",
     "autoprefixer": "^10.x.x",
     "postcss": "^8.x.x",
