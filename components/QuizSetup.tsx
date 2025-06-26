@@ -64,16 +64,16 @@ const QuizSetup: React.FC<QuizSetupProps> = ({
     "w-full font-bold rounded-2xl py-3 px-6 sm:px-8 text-base sm:text-lg";
   const blueButtonClasses = `
     ${baseClasses} 
-    text-gray-900 bg-[#49C0F8] 
+    text-[#141F23] bg-[#49C0F8] 
     border-b-4 border-[#1898D5]
     active:translate-y-[2px] active:border-b-2
     transform-gpu transition-transform duration-100 ease-in-out
   `;
   const reviewButtonClasses = `
-    ${baseClasses}
-    text-white bg-gray-700
-    border-b-4 border-gray-900
-    active:translate-y-[2px] active:border-b-2
+    ${baseClasses} 
+    text-gray-100 bg-transparent
+    border-2 border-[#38464F] border-b-[4px]
+    active:translate-y-[2px]
     transform-gpu transition-transform duration-100 ease-in-out
   `;
 

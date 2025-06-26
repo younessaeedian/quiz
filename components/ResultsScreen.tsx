@@ -53,23 +53,21 @@ const ResultsScreen: React.FC<ResultsScreenProps> = ({
 
   const baseClasses =
     "w-full font-bold rounded-2xl py-3 px-6 sm:px-8 text-base sm:text-lg";
-
-  // **تغییر اصلی:** جایگزینی slate با gray
-  const reviewButtonClasses = `
-    ${baseClasses}
-    text-white bg-gray-700
-    border-b-4 border-gray-900
-    active:translate-y-[2px] active:border-b-2
-    transform-gpu transition-transform duration-100 ease-in-out
-  `;
-
-  const primaryButtonClasses = `
+  const blueButtonClasses = `
     ${baseClasses} 
-    text-white bg-[#2FB5FA] 
-    border-b-4 border-[#1A7A9A]
+    text-[#141F23] bg-[#49C0F8] 
+    border-b-4 border-[#1898D5]
     active:translate-y-[2px] active:border-b-2
     transform-gpu transition-transform duration-100 ease-in-out
   `;
+  const reviewButtonClasses = `
+    ${baseClasses} 
+    text-gray-100 bg-transparent
+    border-2 border-[#38464F] border-b-[4px]
+    active:translate-y-[2px]
+    transform-gpu transition-transform duration-100 ease-in-out
+  `;
+
 
   useEffect(() => {
     let anim: any = null;

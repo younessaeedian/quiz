@@ -38,7 +38,7 @@ const CheckIcon: React.FC<{ className?: string }> = ({
       <path
         d="M17.319 8.44788L10.2071 15.5521L6.68115 12.0261"
         stroke="#141F23"
-        strokeWidth="2.15721"
+        strokeWidth="3.5"
         strokeLinecap="round"
         strokeLinejoin="round"
       />
@@ -150,7 +150,7 @@ const QuestionDisplay: React.FC<QuestionDisplayProps> = ({
                 {option}
               </span>
               {isCorrectChoice && (
-                <CheckIcon className="h-5 w-5 sm:h-6 sm:w-6 ms-2 me-1" />
+                <CheckIcon className="h-5 w-5 sm:h-6 sm:w-6 ms-2" />
               )}
             </button>
           );
