@@ -1,5 +1,5 @@
 import React, { useEffect, useRef } from "react";
-import lottie from "lottie-web"; // وارد کردن Lottie از پکیج نصب شده
+import lottie from "lottie-web";
 import { goodScoreAnimationData } from "../data/goodScoreAnimation";
 
 interface ResultsScreenProps {
@@ -32,33 +32,41 @@ const ResultsScreen: React.FC<ResultsScreenProps> = ({
       : 0;
   const isGoodScore = gradeValue >= 12;
 
+  // ===== شروع بخش تغییرات =====
+
+  let feedbackTitle = "";
   let feedbackMessage = "";
+
   if (gradeValue >= 16) {
+    feedbackTitle = "⭐ فوق‌العاده!";
     feedbackMessage = "دمت گرم! عالی بود، همین فرمونو برو جلو.";
   } else if (gradeValue >= 12) {
+    feedbackTitle = "آفرین، نمره‌ات خوبه!";
     feedbackMessage =
-      "آفرین! فقط یه کم بیشتر تمرین کنی، همه سوال‌ها رو کامل جواب می‌دی.";
+      "فقط یه کم بیشتر تمرین کنی، همه سوال‌ها رو کامل جواب می‌دی.";
   } else if (gradeValue >= 8) {
+    feedbackTitle = "میتونی بهتر باشی";
     feedbackMessage = "بدک نبود! تمرینت رو بیشتر کن، نتیجه‌شو می‌بینی.";
   } else {
-    feedbackMessage =
-      "عیبی نداره! دوباره شروع کن، کم‌کم پیشرفت می‌کنی و نتیجه‌شو می‌بینی.";
+    feedbackTitle = "عیبی نداره، دوباره شروع کن";
+    feedbackMessage = "کم‌کم پیشرفت می‌کنی و نتیجه‌شو می‌بینی.";
   }
+  // ===== پایان بخش تغییرات =====
 
   const baseClasses =
     "w-full font-bold rounded-2xl py-3 px-6 sm:px-8 text-base sm:text-lg";
 
   const reviewButtonClasses = `
     ${baseClasses}
-    text-gray-100 bg-transparent
-    border-2 border-[#38464F] border-b-[4px] border-b-[#38464F]
-    active:translate-y-[2px]
+    bg-transparent text-gray-100 
+    border-2 border-[#38464F] border-b-[4px] 
+    active:translate-y-[2px] cursor-pointer
     transform-gpu transition-transform duration-100 ease-in-out
   `;
 
-  const primaryButtonClasses = `
+  const restartButtonClasses = `
     ${baseClasses} 
-    text-gray-900 bg-[#49C0F8] 
+    text-[#141F23] bg-[#49C0F8] 
     border-b-4 border-[#1898D5]
     active:translate-y-[2px] active:border-b-2
     transform-gpu transition-transform duration-100 ease-in-out
@@ -90,37 +98,62 @@ const ResultsScreen: React.FC<ResultsScreenProps> = ({
   }, [isGoodScore]);
 
   return (
-    <>
-      <div className="space-y-6 text-center fade-in flex-grow flex flex-col justify-center">
-        {isGoodScore && (
-          <div
-            ref={animationContainerRef}
-            className="w-48 h-48 sm:w-56 sm:h-56 mx-auto mb-3"
-            aria-label="انیمیشن تشویقی برای نمره خوب"
-            role="img"
-          ></div>
-        )}
-        <div>
-          <h2 className="text-3xl font-bold text-[#2FB5FA]">
-            نمره شما:{" "}
-            <span className="font-bold">{toPersianDigits(gradeValue)}</span> از{" "}
-            {toPersianDigits(20)}
-          </h2>
-          <p className="text-xl text-gray-200 mt-2">
-            <span className="font-bold">{toPersianDigits(score)}</span> پاسخ
-            درست از{" "}
-            <span className="font-bold">{toPersianDigits(totalQuestions)}</span>{" "}
-            سوال
-          </p>
-          <p className="text-gray-300 mt-4 mb-6">{feedbackMessage}</p>
+    <div className="container mx-auto text-center flex-grow flex flex-col justify-center">
+      <div className="score-section mb-12">
+        <div className="score-main text-8xl font-bold text-white mb-2">
+          {toPersianDigits(gradeValue)}
+        </div>
+        <div className="score-total text-xl text-gray-400">
+          از {toPersianDigits(20)} نمره
         </div>
       </div>
-      <div className="fixed bottom-0 left-0 right-0 bg-gray-800/80 backdrop-blur-sm px-4 pt-4 pb-8 z-30 border-t border-gray-700/50">
+
+      <div className="stats-container mb-12">
+        <div className="flex justify-between space-x-3 rtl:space-x-reverse">
+          <div className="stat-item flex-1 text-center bg-[#202F36] p-4 rounded-xl">
+            <div className="stat-number text-3xl font-semibold text-white mb-2">
+              {toPersianDigits(score)}
+            </div>
+            <div className="stat-label text-sm font-medium text-gray-400">
+              پاسخ درست
+            </div>
+          </div>
+          <div className="stat-item flex-1 text-center bg-[#202F36] p-4 rounded-xl">
+            <div className="stat-number text-3xl font-semibold text-white mb-2">
+              {toPersianDigits(totalQuestions - score)}
+            </div>
+            <div className="stat-label text-sm font-medium text-gray-400">
+              پاسخ نادرست
+            </div>
+          </div>
+          <div className="stat-item flex-1 text-center bg-[#202F36] p-4 rounded-xl">
+            <div className="stat-number text-3xl font-semibold text-white mb-2">
+              {toPersianDigits(totalQuestions)}
+            </div>
+            <div className="stat-label text-sm font-medium text-gray-400">
+              کل سوالات
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* ===== شروع بخش تغییرات JSX ===== */}
+      <div className="hint-section mb-12 px-4">
+        <h2 className="text-xl sm:text-2xl font-bold text-white mb-2">
+          {feedbackTitle}
+        </h2>
+        <p
+          className="hint-text text-base text-gray-400 leading-relaxed"
+          dangerouslySetInnerHTML={{ __html: feedbackMessage }}
+        ></p>
+      </div>
+      {/* ===== پایان بخش تغییرات JSX ===== */}
+
+      <div className="fixed bottom-0 left-0 right-0 bg-[#141F23]/80 backdrop-blur-sm px-4 pt-4 pb-8 z-30 border-t border-gray-700/50">
         <div className="max-w-xl mx-auto space-y-3">
           {globalIncorrectCount > 0 && (
             <button
               onClick={onStartGlobalReviewQuiz}
-              onTouchStart={() => {}}
               className={reviewButtonClasses}
               aria-label={`مرور ${toPersianDigits(
                 globalIncorrectCount
@@ -131,15 +164,14 @@ const ResultsScreen: React.FC<ResultsScreenProps> = ({
           )}
           <button
             onClick={onRestart}
-            onTouchStart={() => {}}
-            className={primaryButtonClasses}
+            className={restartButtonClasses}
             aria-label="شروع دوباره آزمون"
           >
             شروع دوباره آزمون
           </button>
         </div>
       </div>
-    </>
+    </div>
   );
 };
 

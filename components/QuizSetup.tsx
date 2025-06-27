@@ -61,7 +61,7 @@ const QuizSetup: React.FC<QuizSetupProps> = ({
 }) => {
   const baseClasses =
     "w-full font-bold rounded-2xl py-3 px-6 sm:px-8 text-base sm:text-lg";
-  
+
   // ===== تغییر اصلی در اینجا اعمال شده است =====
   const reviewButtonClasses = `
     ${baseClasses}
