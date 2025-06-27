@@ -50,7 +50,7 @@ const ResultsScreen: React.FC<ResultsScreenProps> = ({
   } else if (gradeValue >= 8) {
     feedbackTitle = "میتونی بهتر باشی";
     feedbackMessage = "بدک نبود! تمرینت رو بیشتر کن، نتیجه‌شو می‌بینی.";
-    scoreColorClass = "text-yellow-400"; // رنگ یک پله روشن‌تر شد
+    scoreColorClass = "text-amber-400"; // رنگ یک پله روشن‌تر شد
   } else {
     feedbackTitle = "عیبی نداره، دوباره شروع کن";
     feedbackMessage = "کم‌کم پیشرفت می‌کنی و نتیجه‌شو می‌بینی.";
