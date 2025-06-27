@@ -36,20 +36,25 @@ const ResultsScreen: React.FC<ResultsScreenProps> = ({
 
   let feedbackTitle = "";
   let feedbackMessage = "";
+  let scoreColorClass = "";
 
   if (gradeValue >= 16) {
-    feedbackTitle = "⭐ فوق‌العاده!";
+    feedbackTitle = "فوق‌العاده!";
     feedbackMessage = "دمت گرم! عالی بود، همین فرمونو برو جلو.";
+    scoreColorClass = "text-green-400"; // رنگ یک پله روشن‌تر شد
   } else if (gradeValue >= 12) {
     feedbackTitle = "آفرین، نمره‌ات خوبه!";
     feedbackMessage =
       "فقط یه کم بیشتر تمرین کنی، همه سوال‌ها رو کامل جواب می‌دی.";
+    scoreColorClass = "text-cyan-400"; // رنگ یک پله روشن‌تر شد
   } else if (gradeValue >= 8) {
     feedbackTitle = "میتونی بهتر باشی";
     feedbackMessage = "بدک نبود! تمرینت رو بیشتر کن، نتیجه‌شو می‌بینی.";
+    scoreColorClass = "text-yellow-400"; // رنگ یک پله روشن‌تر شد
   } else {
     feedbackTitle = "عیبی نداره، دوباره شروع کن";
     feedbackMessage = "کم‌کم پیشرفت می‌کنی و نتیجه‌شو می‌بینی.";
+    scoreColorClass = "text-red-400"; // رنگ یک پله روشن‌تر شد
   }
   // ===== پایان بخش تغییرات =====
 
@@ -100,7 +105,9 @@ const ResultsScreen: React.FC<ResultsScreenProps> = ({
   return (
     <div className="container mx-auto text-center flex-grow flex flex-col justify-center">
       <div className="score-section mb-12">
-        <div className="score-main text-8xl font-bold text-white mb-2">
+        <div
+          className={`score-main text-8xl font-bold mb-2 transition-colors duration-500 ${scoreColorClass}`}
+        >
           {toPersianDigits(gradeValue)}
         </div>
         <div className="score-total text-xl text-gray-400">
@@ -137,9 +144,9 @@ const ResultsScreen: React.FC<ResultsScreenProps> = ({
         </div>
       </div>
 
-      {/* ===== شروع بخش تغییرات JSX ===== */}
       <div className="hint-section mb-12 px-4">
-        <h2 className="text-xl sm:text-2xl font-bold text-white mb-2">
+        {/* تیتر بازخورد به رنگ سفید و ثابت بازگشت */}
+        <h2 className={`text-xl sm:text-2xl font-bold text-white mb-2`}>
           {feedbackTitle}
         </h2>
         <p
@@ -147,7 +154,6 @@ const ResultsScreen: React.FC<ResultsScreenProps> = ({
           dangerouslySetInnerHTML={{ __html: feedbackMessage }}
         ></p>
       </div>
-      {/* ===== پایان بخش تغییرات JSX ===== */}
 
       <div className="fixed bottom-0 left-0 right-0 bg-[#141F23]/80 backdrop-blur-sm px-4 pt-4 pb-8 z-30 border-t border-gray-700/50">
         <div className="max-w-xl mx-auto space-y-3">
