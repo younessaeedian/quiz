@@ -11,12 +11,11 @@
   },
   "dependencies": {
     "@vercel/speed-insights": "^1.2.0",
-    "lottie-web": "^5.12.2",
+    "lottie-react": "^2.4.1",
     "react": "^19.1.0",
     "react-dom": "^19.1.0"
   },
   "devDependencies": {
-    "lottie-web": "^5.13.0",
     "@types/node": "^22.14.0",
     "autoprefixer": "^10.x.x",
     "postcss": "^8.x.x",

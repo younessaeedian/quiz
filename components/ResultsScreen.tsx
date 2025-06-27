@@ -1,6 +1,6 @@
-import React, { useEffect, useRef } from "react";
-import lottie from "lottie-web";
-import { goodScoreAnimationData } from "../data/goodScoreAnimation";
+import React from "react";
+import Lottie from "lottie-react";
+import getmedalAnimation from "../public/animation/getmedal.json";
 
 interface ResultsScreenProps {
   score: number;
@@ -25,14 +25,12 @@ const ResultsScreen: React.FC<ResultsScreenProps> = ({
   onStartGlobalReviewQuiz,
   globalIncorrectCount,
 }) => {
-  const animationContainerRef = useRef<HTMLDivElement>(null);
   const gradeValue =
     totalQuestions > 0
       ? parseFloat(((score / totalQuestions) * 20).toFixed(1))
       : 0;
-  const isGoodScore = gradeValue >= 12;
 
-  // ===== شروع بخش تغییرات =====
+  const isGoodScore = gradeValue >= 10;
 
   let feedbackTitle = "";
   let feedbackMessage = "";
@@ -41,22 +39,21 @@ const ResultsScreen: React.FC<ResultsScreenProps> = ({
   if (gradeValue >= 16) {
     feedbackTitle = "فوق‌العاده!";
     feedbackMessage = "دمت گرم! عالی بود، همین فرمونو برو جلو.";
-    scoreColorClass = "text-green-400"; // رنگ یک پله روشن‌تر شد
+    scoreColorClass = "text-green-400";
   } else if (gradeValue >= 12) {
     feedbackTitle = "آفرین، نمره‌ات خوبه!";
     feedbackMessage =
       "فقط یه کم بیشتر تمرین کنی، همه سوال‌ها رو کامل جواب می‌دی.";
-    scoreColorClass = "text-[#49C0F8]"; // رنگ یک پله روشن‌تر شد
+    scoreColorClass = "text-[#49C0F8]";
   } else if (gradeValue >= 8) {
     feedbackTitle = "میتونی بهتر باشی";
     feedbackMessage = "بدک نبود! تمرینت رو بیشتر کن، نتیجه‌شو می‌بینی.";
-    scoreColorClass = "text-amber-400"; // رنگ یک پله روشن‌تر شد
+    scoreColorClass = "text-orange-400";
   } else {
     feedbackTitle = "عیبی نداره، دوباره شروع کن";
     feedbackMessage = "کم‌کم پیشرفت می‌کنی و نتیجه‌شو می‌بینی.";
-    scoreColorClass = "text-red-400"; // رنگ یک پله روشن‌تر شد
+    scoreColorClass = "text-red-400";
   }
-  // ===== پایان بخش تغییرات =====
 
   const baseClasses =
     "w-full font-bold rounded-2xl py-3 px-6 sm:px-8 text-base sm:text-lg";
@@ -77,33 +74,24 @@ const ResultsScreen: React.FC<ResultsScreenProps> = ({
     transform-gpu transition-transform duration-100 ease-in-out
   `;
 
-  useEffect(() => {
-    let anim: any = null;
-
-    if (isGoodScore && animationContainerRef.current) {
-      try {
-        const parsedAnimationData = JSON.parse(goodScoreAnimationData);
-        anim = lottie.loadAnimation({
-          container: animationContainerRef.current,
-          renderer: "svg",
-          loop: true,
-          autoplay: true,
-          animationData: parsedAnimationData,
-        });
-      } catch (error) {
-        console.error("Failed to parse or load Lottie animation:", error);
-      }
-    }
-
-    return () => {
-      if (anim) {
-        anim.destroy();
-      }
-    };
-  }, [isGoodScore]);
-
   return (
-    <div className="container mx-auto text-center flex-grow flex flex-col justify-center">
+    // این والد relative باقی می‌ماند تا انیمیشن نسبت به آن مکان‌یابی شود
+    <div className="relative container mx-auto text-center flex-grow flex flex-col justify-center">
+      {isGoodScore && (
+        <div
+          // ===== تغییر کلیدی ۱: استایل‌دهی برای شناور شدن کامل =====
+          // absolute باعث می‌شود عنصر از جریان عادی خارج شود و روی بقیه قرار گیرد.
+          className="absolute -top-16 sm:-top-24 left-0 right-0 z-10 pointer-events-none"
+          aria-hidden="true"
+        >
+          <Lottie animationData={getmedalAnimation} loop={true} />
+        </div>
+      )}
+
+      {/* ===== تغییر کلیدی ۲: حذف margin-top اضافی =====
+          کلاس‌های mt-20 sm:mt-24 از اینجا حذف شد.
+          حالا این بخش در جای طبیعی خود قرار می‌گیرد و انیمیشن روی آن شناور است.
+      */}
       <div className="score-section mb-12">
         <div
           className={`score-main text-8xl font-bold mb-2 transition-colors duration-500 ${scoreColorClass}`}
@@ -145,7 +133,6 @@ const ResultsScreen: React.FC<ResultsScreenProps> = ({
       </div>
 
       <div className="hint-section mb-12 px-4">
-        {/* تیتر بازخورد به رنگ سفید و ثابت بازگشت */}
         <h2 className={`text-xl sm:text-2xl font-bold text-white mb-2`}>
           {feedbackTitle}
         </h2>
