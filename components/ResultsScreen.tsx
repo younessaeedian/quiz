@@ -46,7 +46,7 @@ const ResultsScreen: React.FC<ResultsScreenProps> = ({
     feedbackTitle = "آفرین، نمره‌ات خوبه!";
     feedbackMessage =
       "فقط یه کم بیشتر تمرین کنی، همه سوال‌ها رو کامل جواب می‌دی.";
-    scoreColorClass = "text-cyan-400"; // رنگ یک پله روشن‌تر شد
+    scoreColorClass = "text-[#49C0F8]"; // رنگ یک پله روشن‌تر شد
   } else if (gradeValue >= 8) {
     feedbackTitle = "میتونی بهتر باشی";
     feedbackMessage = "بدک نبود! تمرینت رو بیشتر کن، نتیجه‌شو می‌بینی.";
