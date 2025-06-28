@@ -1,4 +1,3 @@
-
 export interface QuizInfo {
   title: string;
   instructorName: string;
@@ -10,5 +9,5 @@ export const quizDetails: QuizInfo = {
   title: "آزمون آمادگی تاریخ اسلام",
   instructorName: "حسن فضل",
   examDate: "1404/04/26",
-  examTime: "10:00"
+  examTime: "10:00",
 };

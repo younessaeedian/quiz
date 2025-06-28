@@ -1,3 +1,5 @@
+// App.tsx
+
 import React, {
   useState,
   useCallback,
@@ -7,16 +9,16 @@ import React, {
   lazy,
 } from "react";
 import { SpeedInsights } from "@vercel/speed-insights/react";
-import { Question, GameState } from "./types";
+import { Question, DescriptiveQuestion, GameState, QuizMode } from "./types";
 import { defaultQuestions } from "./data/questions";
+import { descriptiveQuestions } from "./data/descriptiveQuestions";
 import QuizSetup from "./components/QuizSetup";
 import QuestionDisplay from "./components/QuestionDisplay";
+import DescriptiveQuestionDisplay from "./components/DescriptiveQuestionDisplay";
 
-// وارد کردن کامپوننت صفحه نتایج به صورت lazy برای بهینه‌سازی سرعت لود
 const ResultsScreen = lazy(() => import("./components/ResultsScreen"));
 
 const INCORRECT_QUESTION_IDS_KEY = "interactiveQuizIncorrectQuestionIds";
-const ACTIVE_QUIZ_STATE_KEY = "activeQuizState";
 
 const shuffleArray = <T,>(array: T[]): T[] => {
   const newArray = [...array];
@@ -56,10 +58,10 @@ const CloseIcon: React.FC<{ className?: string }> = ({
 
 const App: React.FC = () => {
   const [gameState, setGameState] = useState<GameState>(GameState.SETUP);
-  const [masterQuestionList] = useState<Question[]>(() =>
-    shuffleArray(defaultQuestions)
-  );
-  const [questions, setQuestions] = useState<Question[]>([]);
+  const [quizMode, setQuizMode] = useState<QuizMode | null>(null);
+  const [questions, setQuestions] = useState<
+    (Question | DescriptiveQuestion)[]
+  >([]);
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState<number>(0);
   const [score, setScore] = useState<number>(0);
   const [selectedAnswer, setSelectedAnswer] = useState<string | null>(null);
@@ -86,34 +88,6 @@ const App: React.FC = () => {
   };
 
   useEffect(() => {
-    const savedStateJSON = localStorage.getItem(ACTIVE_QUIZ_STATE_KEY);
-    if (savedStateJSON) {
-      try {
-        const savedState = JSON.parse(savedStateJSON);
-        if (
-          savedState.gameState === GameState.QUIZ &&
-          Array.isArray(savedState.questions) &&
-          savedState.questions.length > 0
-        ) {
-          setQuestions(savedState.questions);
-          setCurrentQuestionIndex(savedState.currentQuestionIndex);
-          setScore(savedState.score || 0);
-          setIsReviewMode(savedState.isReviewMode || false);
-          setCurrentOptions(
-            shuffleArray(
-              savedState.questions[savedState.currentQuestionIndex].options
-            )
-          );
-          setGameState(GameState.QUIZ);
-        } else {
-          localStorage.removeItem(ACTIVE_QUIZ_STATE_KEY);
-        }
-      } catch (e) {
-        console.error("Failed to parse saved state, removing it.", e);
-        localStorage.removeItem(ACTIVE_QUIZ_STATE_KEY);
-      }
-    }
-
     const storedIdsRaw = localStorage.getItem(INCORRECT_QUESTION_IDS_KEY);
     if (storedIdsRaw) {
       try {
@@ -133,59 +107,61 @@ const App: React.FC = () => {
     }
   }, []);
 
-  useEffect(() => {
-    if (gameState === GameState.QUIZ && questions.length > 0) {
-      const stateToSave = {
-        gameState,
-        questions,
-        currentQuestionIndex,
-        score,
-        isReviewMode,
-      };
-      localStorage.setItem(ACTIVE_QUIZ_STATE_KEY, JSON.stringify(stateToSave));
-    }
-  }, [gameState, questions, currentQuestionIndex, score, isReviewMode]);
-
   const handleRestartQuiz = useCallback(() => {
-    localStorage.removeItem(ACTIVE_QUIZ_STATE_KEY);
     setGameState(GameState.SETUP);
+    setQuizMode(null);
   }, []);
 
   const startQuizInternal = useCallback(
-    (questionsToPlay: Question[], reviewMode: boolean) => {
+    (
+      questionsToPlay: (Question | DescriptiveQuestion)[],
+      mode: QuizMode,
+      reviewMode: boolean
+    ) => {
       if (questionsToPlay.length === 0) {
         alert("سوالی برای این آزمون یافت نشد.");
         setGameState(GameState.SETUP);
         return;
       }
-      localStorage.removeItem(ACTIVE_QUIZ_STATE_KEY);
       const shuffledQuestions = shuffleArray(questionsToPlay);
       setQuestions(shuffledQuestions);
       setCurrentQuestionIndex(0);
       setScore(0);
       setSelectedAnswer(null);
       setShowFeedback(false);
-      setCurrentOptions(shuffleArray(shuffledQuestions[0].options));
+      if (mode === QuizMode.MULTIPLE_CHOICE) {
+        setCurrentOptions(
+          shuffleArray((shuffledQuestions[0] as Question).options)
+        );
+      }
       setIsReviewMode(reviewMode);
+      setQuizMode(mode);
       setGameState(GameState.QUIZ);
     },
     []
   );
 
-  const handleStartNewQuiz = useCallback(() => {
-    startQuizInternal(masterQuestionList, false);
-  }, [masterQuestionList, startQuizInternal]);
+  const handleStartNewQuiz = useCallback(
+    (mode: QuizMode) => {
+      const questionSet =
+        mode === QuizMode.MULTIPLE_CHOICE
+          ? defaultQuestions
+          : descriptiveQuestions;
+      startQuizInternal(questionSet, mode, false);
+    },
+    [startQuizInternal]
+  );
 
   const handleStartReviewQuiz = useCallback(() => {
-    const incorrectQuestions = masterQuestionList.filter((q) =>
+    const incorrectQuestions = defaultQuestions.filter((q) =>
       persistedIncorrectIds.has(q.id)
     );
     if (incorrectQuestions.length === 0) {
       alert("شما سوال غلطی برای مرور ندارید!");
       return;
     }
-    startQuizInternal(incorrectQuestions, true);
-  }, [masterQuestionList, persistedIncorrectIds, startQuizInternal]);
+    startQuizInternal(incorrectQuestions, QuizMode.MULTIPLE_CHOICE, true);
+  }, [defaultQuestions, persistedIncorrectIds, startQuizInternal]);
 
   const handleAnswerSelect = useCallback(
     (answer: string) => {
@@ -193,7 +169,7 @@ const App: React.FC = () => {
 
       setSelectedAnswer(answer);
       setShowFeedback(true);
-      const currentQ = questions[currentQuestionIndex];
+      const currentQ = questions[currentQuestionIndex] as Question;
 
       if (answer === currentQ.answer) {
         playSound(correctSound);
@@ -241,12 +217,20 @@ const App: React.FC = () => {
     if (currentQuestionIndex < questions.length - 1) {
       const nextIndex = currentQuestionIndex + 1;
       setCurrentQuestionIndex(nextIndex);
-      setCurrentOptions(shuffleArray(questions[nextIndex].options));
+      if (quizMode === QuizMode.MULTIPLE_CHOICE) {
+        setCurrentOptions(
+          shuffleArray((questions[nextIndex] as Question).options)
+        );
+      }
     } else {
-      localStorage.removeItem(ACTIVE_QUIZ_STATE_KEY);
-      setGameState(GameState.RESULTS);
+      if (quizMode === QuizMode.MULTIPLE_CHOICE) {
+        setGameState(GameState.RESULTS);
+      } else {
+        // For descriptive quiz, just go back to setup
+        handleRestartQuiz();
+      }
     }
-  }, [currentQuestionIndex, questions]);
+  }, [currentQuestionIndex, questions, quizMode, handleRestartQuiz]);
 
   const currentQuestion = useMemo(() => {
     if (questions.length > 0 && currentQuestionIndex < questions.length) {
@@ -268,18 +252,31 @@ const App: React.FC = () => {
       case GameState.QUIZ:
         if (!currentQuestion)
           return <p className="text-center p-8">در حال بارگذاری سوالات...</p>;
-        return (
-          <QuestionDisplay
-            question={currentQuestion}
-            options={currentOptions}
-            onAnswerSelect={handleAnswerSelect}
-            selectedAnswer={selectedAnswer}
-            showFeedback={showFeedback}
-            onNextQuestion={handleNextQuestion}
-            currentQuestionNumber={currentQuestionIndex + 1}
-            totalQuestions={questions.length}
-          />
-        );
+        if (quizMode === QuizMode.MULTIPLE_CHOICE) {
+          return (
+            <QuestionDisplay
+              question={currentQuestion as Question}
+              options={currentOptions}
+              onAnswerSelect={handleAnswerSelect}
+              selectedAnswer={selectedAnswer}
+              showFeedback={showFeedback}
+              onNextQuestion={handleNextQuestion}
+              currentQuestionNumber={currentQuestionIndex + 1}
+              totalQuestions={questions.length}
+            />
+          );
+        } else if (quizMode === QuizMode.DESCRIPTIVE) {
+          return (
+            <DescriptiveQuestionDisplay
+              question={currentQuestion as DescriptiveQuestion}
+              onNextQuestion={handleNextQuestion}
+              onRestart={handleRestartQuiz}
+              currentQuestionNumber={currentQuestionIndex + 1}
+              totalQuestions={questions.length}
+            />
+          );
+        }
+        return null;
       case GameState.RESULTS:
         return (
           <Suspense
@@ -342,7 +339,6 @@ const App: React.FC = () => {
         </header>
       )}
 
-      {/* کلاس overflow-x-hidden برای جلوگیری از اسکرول افقی هنگام انیمیشن اضافه شده است */}
       <main className="w-full max-w-xl mx-auto flex-grow flex flex-col px-4 overflow-x-hidden">
         {renderContent()}
       </main>

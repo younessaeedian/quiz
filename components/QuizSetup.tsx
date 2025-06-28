@@ -1,8 +1,11 @@
+// components/QuizSetup.tsx
+
 import React from "react";
 import { quizDetails } from "../data/quizinfo";
+import { QuizMode } from "../types";
 
 interface QuizSetupProps {
-  onStartNewQuiz: () => void;
+  onStartNewQuiz: (mode: QuizMode) => void;
   onStartReviewQuiz: () => void;
   incorrectQuestionsCount: number;
 }
@@ -62,22 +65,21 @@ const QuizSetup: React.FC<QuizSetupProps> = ({
   const baseClasses =
     "w-full font-bold rounded-2xl py-3 px-6 sm:px-8 text-base sm:text-lg";
 
-  // ===== تغییر اصلی در اینجا اعمال شده است =====
-  const reviewButtonClasses = `
-    ${baseClasses}
-    bg-transparent text-gray-100 
-    border-2 border-[#38464F] border-b-[4px] 
-    active:translate-y-[2px] cursor-pointer
-    transform-gpu transition-transform duration-100 ease-in-out
-  `;
+  const secondaryButtonClasses = `
+  ${baseClasses}
+  bg-transparent text-gray-100 
+  border-2 border-[#38464F] border-b-[4px] 
+  active:translate-y-[2px] cursor-pointer
+  transform-gpu transition-transform duration-100 ease-in-out
+`;
 
-  const blueButtonClasses = `
-    ${baseClasses} 
-    text-[#141F23] bg-[#49C0F8] 
-    border-b-4 border-[#1898D5]
-    active:translate-y-[2px] active:border-b-2
-    transform-gpu transition-transform duration-100 ease-in-out
-  `;
+  const primaryButtonClasses = `
+  ${baseClasses} 
+  text-[#141F23] bg-[#49C0F8] 
+  border-b-4 border-[#1898D5]
+  active:translate-y-[2px] active:border-b-2
+  transform-gpu transition-transform duration-100 ease-in-out
+`;
 
   return (
     <div className="flex-grow flex flex-col justify-between h-full">
@@ -87,7 +89,7 @@ const QuizSetup: React.FC<QuizSetupProps> = ({
             {quizDetails.title}
           </h1>
           <p className="text-sm text-gray-400 max-w-md mx-auto">
-            این یک آزمون آزمایشی برای آمادگی شما در درس {quizDetails.title} است.
+            این یک مجموعه آموزشی برای آمادگی شما در درس تاریخ اسلام است.
           </p>
         </div>
 
@@ -142,22 +144,30 @@ const QuizSetup: React.FC<QuizSetupProps> = ({
             <button
               onClick={onStartReviewQuiz}
               onTouchStart={() => {}}
-              className={reviewButtonClasses}
+              className={secondaryButtonClasses}
               aria-label={`مرور ${toPersianDigits(
                 incorrectQuestionsCount
-              )} سوالی که قبلا اشتباه پاسخ داده اید`}
+              )} سوال غلط`}
             >
               مرور سوال‌های غلط ({toPersianDigits(incorrectQuestionsCount)}{" "}
               سوال)
             </button>
           )}
           <button
-            onClick={onStartNewQuiz}
+            onClick={() => onStartNewQuiz(QuizMode.DESCRIPTIVE)}
             onTouchStart={() => {}}
-            className={blueButtonClasses}
-            aria-label="شروع آزمون جدید"
+            className={secondaryButtonClasses}
+            aria-label="یادگیری سوالات تشریحی"
           >
-            شروع آزمون
+            یادگیری سوالات تشریحی
+          </button>
+          <button
+            onClick={() => onStartNewQuiz(QuizMode.MULTIPLE_CHOICE)}
+            onTouchStart={() => {}}
+            className={primaryButtonClasses}
+            aria-label="شروع آزمون چهارگزینه‌ای"
+          >
+            آزمون چهارگزینه‌ای
           </button>
         </div>
       </div>
