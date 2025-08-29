@@ -9,16 +9,23 @@ import React, {
   lazy,
 } from "react";
 import { SpeedInsights } from "@vercel/speed-insights/react";
-import { Question, DescriptiveQuestion, GameState, QuizMode } from "./types";
-import { defaultQuestions } from "./data/questions";
-import { descriptiveQuestions } from "./data/descriptiveQuestions";
+import {
+  Question,
+  DescriptiveQuestion,
+  GameState,
+  QuizMode,
+  QuizData,
+} from "./types";
+import { quizzes } from "./data/quizzes";
+import CourseSelection from "./components/CourseSelection";
 import QuizSetup from "./components/QuizSetup";
 import QuestionDisplay from "./components/QuestionDisplay";
 import DescriptiveQuestionDisplay from "./components/DescriptiveQuestionDisplay";
 
 const ResultsScreen = lazy(() => import("./components/ResultsScreen"));
 
-const INCORRECT_QUESTION_IDS_KEY = "interactiveQuizIncorrectQuestionIds";
+const INCORRECT_QUESTION_IDS_KEY_PREFIX =
+  "interactiveQuizIncorrectQuestionIds_";
 
 const shuffleArray = <T,>(array: T[]): T[] => {
   const newArray = [...array];
@@ -57,7 +64,10 @@ const CloseIcon: React.FC<{ className?: string }> = ({
 );
 
 const App: React.FC = () => {
-  const [gameState, setGameState] = useState<GameState>(GameState.SETUP);
+  const [gameState, setGameState] = useState<GameState>(
+    GameState.COURSE_SELECTION
+  );
+  const [selectedCourseId, setSelectedCourseId] = useState<string | null>(null);
   const [quizMode, setQuizMode] = useState<QuizMode | null>(null);
   const [questions, setQuestions] = useState<
     (Question | DescriptiveQuestion)[]
@@ -82,13 +92,22 @@ const App: React.FC = () => {
     []
   );
 
+  const incorrectQuestionIdsKey = useMemo(
+    () =>
+      selectedCourseId
+        ? `${INCORRECT_QUESTION_IDS_KEY_PREFIX}${selectedCourseId}`
+        : null,
+    [selectedCourseId]
+  );
+
   const playSound = (audio: HTMLAudioElement) => {
     audio.currentTime = 0;
     audio.play().catch((error) => console.error("Error playing sound:", error));
   };
 
   useEffect(() => {
-    const storedIdsRaw = localStorage.getItem(INCORRECT_QUESTION_IDS_KEY);
+    if (!incorrectQuestionIdsKey) return;
+    const storedIdsRaw = localStorage.getItem(incorrectQuestionIdsKey);
     if (storedIdsRaw) {
       try {
         const storedIds = JSON.parse(storedIdsRaw);
@@ -102,9 +121,21 @@ const App: React.FC = () => {
           "Failed to parse incorrect question IDs from localStorage:",
           error
         );
-        localStorage.removeItem(INCORRECT_QUESTION_IDS_KEY);
+        localStorage.removeItem(incorrectQuestionIdsKey);
       }
+    } else {
+      setPersistedIncorrectIds(new Set());
     }
+  }, [incorrectQuestionIdsKey]);
+
+  const handleSelectCourse = useCallback((courseId: string) => {
+    setSelectedCourseId(courseId);
+    setGameState(GameState.SETUP);
+  }, []);
+
+  const handleBackToCourseSelection = useCallback(() => {
+    setGameState(GameState.COURSE_SELECTION);
+    setSelectedCourseId(null);
   }, []);
 
   const handleRestartQuiz = useCallback(() => {
@@ -143,17 +174,21 @@ const App: React.FC = () => {
 
   const handleStartNewQuiz = useCallback(
     (mode: QuizMode) => {
+      if (!selectedCourseId) return;
+      const currentQuizData = quizzes[selectedCourseId];
       const questionSet =
         mode === QuizMode.MULTIPLE_CHOICE
-          ? defaultQuestions
-          : descriptiveQuestions;
+          ? currentQuizData.questions
+          : currentQuizData.descriptiveQuestions;
       startQuizInternal(questionSet, mode, false);
     },
-    [startQuizInternal]
+    [selectedCourseId, startQuizInternal]
   );
 
   const handleStartReviewQuiz = useCallback(() => {
-    const incorrectQuestions = defaultQuestions.filter((q) =>
+    if (!selectedCourseId) return;
+    const currentQuizData = quizzes[selectedCourseId];
+    const incorrectQuestions = currentQuizData.questions.filter((q) =>
       persistedIncorrectIds.has(q.id)
     );
     if (incorrectQuestions.length === 0) {
@@ -161,11 +196,11 @@ const App: React.FC = () => {
       return;
     }
     startQuizInternal(incorrectQuestions, QuizMode.MULTIPLE_CHOICE, true);
-  }, [defaultQuestions, persistedIncorrectIds, startQuizInternal]);
+  }, [persistedIncorrectIds, selectedCourseId, startQuizInternal]);
 
   const handleAnswerSelect = useCallback(
     (answer: string) => {
-      if (showFeedback) return;
+      if (showFeedback || !incorrectQuestionIdsKey) return;
 
       setSelectedAnswer(answer);
       setShowFeedback(true);
@@ -179,7 +214,7 @@ const App: React.FC = () => {
             const newSet = new Set(prev);
             newSet.delete(currentQ.id);
             localStorage.setItem(
-              INCORRECT_QUESTION_IDS_KEY,
+              incorrectQuestionIdsKey,
               JSON.stringify(Array.from(newSet))
             );
             return newSet;
@@ -192,7 +227,7 @@ const App: React.FC = () => {
             const newSet = new Set(prev);
             newSet.add(currentQ.id);
             localStorage.setItem(
-              INCORRECT_QUESTION_IDS_KEY,
+              incorrectQuestionIdsKey,
               JSON.stringify(Array.from(newSet))
             );
             return newSet;
@@ -207,6 +242,7 @@ const App: React.FC = () => {
       isReviewMode,
       correctSound,
       incorrectSound,
+      incorrectQuestionIdsKey,
     ]
   );
 
@@ -232,6 +268,10 @@ const App: React.FC = () => {
     }
   }, [currentQuestionIndex, questions, quizMode, handleRestartQuiz]);
 
+  const currentQuizData: QuizData | null = useMemo(() => {
+    return selectedCourseId ? quizzes[selectedCourseId] : null;
+  }, [selectedCourseId]);
+
   const currentQuestion = useMemo(() => {
     if (questions.length > 0 && currentQuestionIndex < questions.length) {
       return questions[currentQuestionIndex];
@@ -241,12 +281,17 @@ const App: React.FC = () => {
 
   const renderContent = () => {
     switch (gameState) {
+      case GameState.COURSE_SELECTION:
+        return <CourseSelection onSelectCourse={handleSelectCourse} />;
       case GameState.SETUP:
+        if (!currentQuizData) return null;
         return (
           <QuizSetup
+            quizInfo={currentQuizData.info}
             onStartNewQuiz={handleStartNewQuiz}
             onStartReviewQuiz={handleStartReviewQuiz}
             incorrectQuestionsCount={persistedIncorrectIds.size}
+            onBack={handleBackToCourseSelection}
           />
         );
       case GameState.QUIZ:

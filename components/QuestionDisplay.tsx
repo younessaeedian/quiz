@@ -1,3 +1,5 @@
+// components/QuestionDisplay.tsx
+
 import React, { useEffect, useCallback } from "react";
 import { Question } from "../types";
 
@@ -109,9 +111,7 @@ const QuestionDisplay: React.FC<QuestionDisplayProps> = ({
   };
 
   return (
-    // این div اصلی، کل محتوای سوال (شماره، متن، و گزینه‌ها) را به صورت عمودی وسط‌چین می‌کند
     <div className="flex flex-col justify-center flex-grow">
-      {/* این div کل بلوک سوال را در بر می‌گیرد و انیمیشن اسلاید از چپ را دریافت می‌کند */}
       <div key={question.id} className="animate-slide-in-left">
         <div className="text-center text-sm text-gray-400 mb-3 sm:mb-4">
           سوال {toPersianDigits(currentQuestionNumber)} از{" "}

@@ -1,13 +1,14 @@
 // components/QuizSetup.tsx
 
 import React from "react";
-import { quizDetails } from "../data/quizinfo";
-import { QuizMode } from "../types";
+import { QuizInfo, QuizMode } from "../types";
 
 interface QuizSetupProps {
+  quizInfo: QuizInfo;
   onStartNewQuiz: (mode: QuizMode) => void;
   onStartReviewQuiz: () => void;
   incorrectQuestionsCount: number;
+  onBack: () => void;
 }
 
 const toPersianDigits = (num: string | number): string => {
@@ -57,10 +58,27 @@ const UserIcon: React.FC<{ className?: string }> = ({
   </svg>
 );
 
+// آیکون بازگشت با جهت برعکس و بزرگتر
+const BackIcon: React.FC<{ className?: string }> = ({
+  className = "w-6 h-6",
+}) => (
+  <svg
+    xmlns="http://www.w3.org/2000/svg"
+    viewBox="0 0 24 24"
+    fill="currentColor"
+    className={className}
+  >
+    <path d="M4 11h12.17l-5.59-5.59L12 4l8 8-8 8-1.41-1.41L16.17 13H4v-2z" />{" "}
+    {/* جهت فلش تغییر کرد */}
+  </svg>
+);
+
 const QuizSetup: React.FC<QuizSetupProps> = ({
+  quizInfo,
   onStartNewQuiz,
   onStartReviewQuiz,
   incorrectQuestionsCount,
+  onBack,
 }) => {
   const baseClasses =
     "w-full font-bold rounded-2xl py-3 px-6 sm:px-8 text-base sm:text-lg";
@@ -83,13 +101,25 @@ const QuizSetup: React.FC<QuizSetupProps> = ({
 
   return (
     <div className="flex-grow flex flex-col justify-between h-full">
+      <header className="fixed top-8 left-4 right-4 z-50">
+        <div className="flex items-center justify-between w-full max-w-xl mx-auto h-10">
+          <button
+            onClick={onBack}
+            // کلاس‌های پدینگ و سایز دکمه تغییر کرده‌اند
+            className="p-3 bg-[#202F36] hover:bg-gray-600/80 text-gray-300 hover:text-white rounded-full focus:outline-none focus:ring-2 focus:ring-gray-500 shrink-0"
+            aria-label="بازگشت به انتخاب درس"
+          >
+            <BackIcon className="w-5 h-5" /> {/* سایز آیکون بزرگتر شده */}
+          </button>
+        </div>
+      </header>
       <div className="fade-in flex-grow flex flex-col justify-center space-y-8">
         <div className="text-center space-y-3">
           <h1 className="text-2xl sm:text-3xl font-bold text-white">
-            {quizDetails.title}
+            {quizInfo.title}
           </h1>
           <p className="text-sm text-gray-400 max-w-md mx-auto">
-            این یک مجموعه آموزشی برای آمادگی شما در درس تاریخ اسلام است.
+            این یک مجموعه آموزشی برای آمادگی شما در این درس است.
           </p>
         </div>
 
@@ -103,7 +133,7 @@ const QuizSetup: React.FC<QuizSetupProps> = ({
                 مدرس
               </div>
               <div className="text-base font-semibold text-gray-100">
-                {quizDetails.instructorName}
+                {quizInfo.instructorName}
               </div>
             </div>
           </div>
@@ -117,7 +147,7 @@ const QuizSetup: React.FC<QuizSetupProps> = ({
                 تاریخ امتحان
               </div>
               <div className="text-base font-semibold text-gray-100">
-                {toPersianDigits(quizDetails.examDate)}
+                {toPersianDigits(quizInfo.examDate)}
               </div>
             </div>
           </div>
@@ -131,7 +161,7 @@ const QuizSetup: React.FC<QuizSetupProps> = ({
                 ساعت برگزاری
               </div>
               <div className="text-base font-semibold text-gray-100">
-                {toPersianDigits(quizDetails.examTime)}
+                {toPersianDigits(quizInfo.examTime)}
               </div>
             </div>
           </div>
