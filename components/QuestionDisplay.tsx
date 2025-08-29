@@ -1,6 +1,6 @@
 // components/QuestionDisplay.tsx
 
-import React, { useEffect, useCallback } from "react";
+import React, { useCallback, useMemo } from "react";
 import { Question } from "../types";
 
 interface QuestionDisplayProps {
@@ -13,8 +13,6 @@ interface QuestionDisplayProps {
   currentQuestionNumber: number;
   totalQuestions: number;
 }
-
-const AUTO_ADVANCE_DELAY_MS = 2500;
 
 const toPersianDigits = (num: string | number): string => {
   const persianDigits = ["۰", "۱", "۲", "۳", "۴", "۵", "۶", "۷", "۸", "۹"];
@@ -63,15 +61,10 @@ const QuestionDisplay: React.FC<QuestionDisplayProps> = ({
   currentQuestionNumber,
   totalQuestions,
 }) => {
-  useEffect(() => {
-    let timer: ReturnType<typeof setTimeout>;
-    if (showFeedback) {
-      timer = setTimeout(() => {
-        onNextQuestion();
-      }, AUTO_ADVANCE_DELAY_MS);
-    }
-    return () => clearTimeout(timer);
-  }, [showFeedback, onNextQuestion]);
+  const isLastQuestion = useMemo(
+    () => currentQuestionNumber === totalQuestions,
+    [currentQuestionNumber, totalQuestions]
+  );
 
   const getButtonClasses = useCallback(
     (option: string): string => {
@@ -110,10 +103,13 @@ const QuestionDisplay: React.FC<QuestionDisplayProps> = ({
     return `انتخاب گزینه: ${option}`;
   };
 
+  const nextButtonClasses =
+    "w-full font-bold rounded-2xl py-3 px-6 sm:px-8 text-base sm:text-lg text-[#141F23] bg-[#49C0F8] border-b-4 border-[#1898D5] active:translate-y-[2px] active:border-b-2 transform-gpu transition-transform duration-100 ease-in-out";
+
   return (
     <div className="flex flex-col justify-center flex-grow">
-      <div key={question.id} className="animate-slide-in-left">
-        <div className="text-center text-sm text-gray-400 mb-3 sm:mb-4">
+      <div key={question.id} className="animate-slide-in-left pb-24">
+        <div className="text-right text-sm text-gray-400 mb-3 sm:mb-4">
           سوال {toPersianDigits(currentQuestionNumber)} از{" "}
           {toPersianDigits(totalQuestions)}
         </div>
@@ -148,17 +144,32 @@ const QuestionDisplay: React.FC<QuestionDisplayProps> = ({
             );
           })}
         </div>
+        {showFeedback && question.hint && (
+          <div className="mt-4 p-4 bg-[#202F36] rounded-xl text-right leading-relaxed fade-in">
+            <p className="text-gray-300">{question.hint}</p>
+          </div>
+        )}
       </div>
 
-      <footer className="fixed bottom-4 left-4 right-4 text-center z-20">
-        <a
-          href="https://t.me/unuos"
-          target="_blank"
-          rel="noopener noreferrer"
-          className="text-xs text-gray-600 hover:text-gray-400 transition-colors"
-        >
-          Developed by Younes Saeedian
-        </a>
+      <footer className="fixed bottom-0 left-0 right-0 bg-[#141F23]/80 backdrop-blur-sm px-4 pt-4 pb-8 z-30 border-t border-gray-700/50">
+        <div className="max-w-xl mx-auto flex flex-col items-center">
+          {showFeedback && (
+            <button
+              onClick={onNextQuestion}
+              className={`${nextButtonClasses} mb-3`}
+            >
+              {isLastQuestion ? "مشاهده نتایج" : "سوال بعدی"}
+            </button>
+          )}
+          <a
+            href="https://t.me/unuos"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-xs text-gray-600 hover:text-gray-400 transition-colors"
+          >
+            Developed by Younes Saeedian
+          </a>
+        </div>
       </footer>
     </div>
   );

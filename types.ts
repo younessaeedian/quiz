@@ -5,6 +5,7 @@ export interface Question {
   question: string;
   options: string[];
   answer: string;
+  hint?: string; //  متن راهنما به اینجا اضافه شد
 }
 
 export interface DescriptiveQuestion {

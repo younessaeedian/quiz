@@ -60,12 +60,12 @@ const DescriptiveQuestionDisplay: React.FC<DescriptiveQuestionDisplayProps> = ({
   return (
     <div className="flex flex-col justify-center flex-grow">
       <div key={question.id} className="animate-slide-in-left">
-        <div className="text-center text-sm text-gray-400 mb-3 sm:mb-4">
+        <div className="text-right text-sm text-gray-400 mb-3 sm:mb-4">
           سوال {toPersianDigits(currentQuestionNumber)} از{" "}
           {toPersianDigits(totalQuestions)}
         </div>
         <h2
-          className="text-lg sm:text-xl font-semibold text-gray-100 mb-4 sm:mb-6 text-center leading-relaxed"
+          className="text-lg sm:text-xl font-semibold text-gray-100 mb-4 sm:mb-6 text-right leading-relaxed"
           style={{ minHeight: "4.5em" }}
         >
           {question.question}
